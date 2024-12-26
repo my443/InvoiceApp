@@ -1,0 +1,94 @@
+﻿@page "/notes/edit"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Note</h2>
+<hr />
+@if (Note is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Note" OnValidSubmit="UpdateNote" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Note.Id" value="@Note.Id" />
+                <div class="mb-3">
+                    <label for="notetext" class="form-label">NoteText:</label>
+                    <InputText id="notetext" @bind-Value="Note.NoteText" class="form-control" />
+                    <ValidationMessage For="() => Note.NoteText" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateadded" class="form-label">DateAdded:</label>
+                    <InputDate id="dateadded" @bind-Value="Note.DateAdded" class="form-control" />
+                    <ValidationMessage For="() => Note.DateAdded" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/notes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Note? Note { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Note ??= await context.Notes.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Note is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateNote()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Note!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!NoteExists(Note!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/notes");
+    }
+
+    private bool NoteExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Notes.Any(e => e.Id == id);
+    }
+}

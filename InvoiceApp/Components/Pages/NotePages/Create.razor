@@ -1,0 +1,49 @@
+﻿@page "/notes/create"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Note</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Note" OnValidSubmit="AddNote" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="notetext" class="form-label">NoteText:</label> 
+                <InputTextArea id="notetext" @bind-Value="Note.NoteText" class="form-control" />
+                <ValidationMessage For="() => Note.NoteText" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateadded" class="form-label">DateAdded:</label> 
+                <InputDate id="dateadded" @bind-Value="Note.DateAdded" class="form-control" /> 
+                <ValidationMessage For="() => Note.DateAdded" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/notes">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Note Note { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddNote()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Notes.Add(Note);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/notes");
+    }
+}

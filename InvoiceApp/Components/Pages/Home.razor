@@ -1,8 +1,11 @@
 ﻿@page "/"
-
+@inject InvoiceApp.Services.UserService UserService
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
+<p>
+    @UserService.GetCurrentEmployee().Result.FullName
+</p>

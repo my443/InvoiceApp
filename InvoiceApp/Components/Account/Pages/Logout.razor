@@ -1,0 +1,15 @@
+﻿@page "/logout"
+@inject InvoiceApp.Services.UserService UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h3>Logout</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.LogoutAsync();
+        NavigationManager.NavigateTo("/");
+
+    }
+}

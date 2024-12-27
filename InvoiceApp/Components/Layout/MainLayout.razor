@@ -1,4 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@using InvoiceApp.Models
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject InvoiceApp.Services.UserService UserService
+@inject NavigationManager NavigationManager
+
 
 <div class="page">
     <div class="sidebar">
@@ -6,8 +11,16 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+        <div class="top-row px-4" style="color:white">
+
+            @if (currentUser != null)
+            {
+                <p>@currentUser.UserName</p>
+            }
+            else
+            {
+                <p>No Current User</p>
+            }
         </div>
 
         <article class="content px-4">
@@ -21,3 +34,36 @@
     <a href="." class="reload">Reload</a>
     <span class="dismiss">🗙</span>
 </div>
+
+@code {
+    private string? userName;
+    private ApplicationUser currentUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        await LoadCurrentUserAsync();        
+    }
+
+    private async Task LoadCurrentUserAsync()
+    {
+        currentUser = await UserService.GetCurrentUserAsync();
+    }
+
+    private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        if (e.Location.EndsWith("/logout", StringComparison.OrdinalIgnoreCase))
+        {
+            await LoadCurrentUserAsync();
+            StateHasChanged();
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+
+    
+}

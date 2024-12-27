@@ -5,11 +5,22 @@
 @using InvoiceApp.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject InvoiceApp.Services.UserService UserService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <PageTitle>Index</PageTitle>
 
 <h1>Index</h1>
-
+@if (currentUser != null)
+{
+    <p>@currentUser.UserName</p>
+    <button @onclick="Logout">Logout</button>
+}
+else
+{
+    <p>No Current User</p>
+}
 <p>
     <a href="notes/create">Create New</a>
 </p>
@@ -27,10 +38,18 @@
 
 @code {
     private ApplicationDbContext context = default!;
+    private ApplicationUser currentUser;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
+        currentUser = await UserService.GetCurrentUserAsync();
+    }
+
+    private async Task Logout()
+    {
+        Navigation.NavigateTo("/logout"); // Redirect to home or login page
+        StateHasChanged();
     }
 
     public async ValueTask DisposeAsync() => await context.DisposeAsync();

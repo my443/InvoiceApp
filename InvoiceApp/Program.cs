@@ -17,7 +17,7 @@ namespace InvoiceApp
 
             // Add User Services - For retrieving the current user
             builder.Services.AddHttpContextAccessor();
-            //builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<UserService>();
 
             // Add services to the container.
             builder.Services.AddRazorComponents()
@@ -26,6 +26,7 @@ namespace InvoiceApp
             builder.Services.AddCascadingAuthenticationState();
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
+
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>

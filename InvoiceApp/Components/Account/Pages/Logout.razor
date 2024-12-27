@@ -9,7 +9,6 @@
     protected override async Task OnInitializedAsync()
     {
         await UserService.LogoutAsync();
-        NavigationManager.NavigateTo("/");
-
+        // NavigationManager.NavigateTo("/");
     }
 }

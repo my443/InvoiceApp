@@ -52,10 +52,9 @@
 
     private async void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
     {
-        if (e.Location.EndsWith("/logout", StringComparison.OrdinalIgnoreCase))
+        if (e.Location.EndsWith("/", StringComparison.OrdinalIgnoreCase))
         {
             await LoadCurrentUserAsync();
-            StateHasChanged();
         }
     }
 

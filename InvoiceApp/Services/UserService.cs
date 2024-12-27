@@ -25,6 +25,7 @@ namespace InvoiceApp.Services
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+            _httpContextAccessor.HttpContext.Response.Redirect("/");
         }
 
 

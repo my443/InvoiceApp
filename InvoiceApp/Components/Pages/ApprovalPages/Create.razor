@@ -1,0 +1,49 @@
+﻿@page "/approvals/create"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Approval</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Approval" OnValidSubmit="AddApproval" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="dateapproved" class="form-label">DateApproved:</label> 
+                <InputDate id="dateapproved" @bind-Value="Approval.DateApproved" class="form-control" /> 
+                <ValidationMessage For="() => Approval.DateApproved" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isapproved" class="form-label">IsApproved:</label> 
+                <InputCheckbox id="isapproved" @bind-Value="Approval.IsApproved" class="form-check-input" /> 
+                <ValidationMessage For="() => Approval.IsApproved" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/approvals">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Approval Approval { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddApproval()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Approvals.Add(Approval);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/approvals");
+    }
+}

@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace InvoiceApp.Components.Account
 {
@@ -28,6 +29,7 @@ namespace InvoiceApp.Components.Account
 
             // During static rendering, NavigateTo throws a NavigationException which is handled by the framework as a redirect.
             // So as long as this is called from a statically rendered Identity component, the InvalidOperationException is never thrown.
+            Console.WriteLine($"Redirecting to {uri}");
             navigationManager.NavigateTo(uri);
             throw new InvalidOperationException($"{nameof(IdentityRedirectManager)} can only be used during static rendering.");
         }
@@ -36,6 +38,7 @@ namespace InvoiceApp.Components.Account
         public void RedirectTo(string uri, Dictionary<string, object?> queryParameters)
         {
             var uriWithoutQuery = navigationManager.ToAbsoluteUri(uri).GetLeftPart(UriPartial.Path);
+            Console.WriteLine($"Redirecting to {uriWithoutQuery} with query parameters: {string.Join(", ", queryParameters.Select(kvp => $"{kvp.Key}={kvp.Value}"))}");
             var newUri = navigationManager.GetUriWithQueryParameters(uriWithoutQuery, queryParameters);
             RedirectTo(newUri);
         }

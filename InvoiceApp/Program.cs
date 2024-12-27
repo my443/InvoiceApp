@@ -2,6 +2,7 @@
 using InvoiceApp.Components.Account;
 using InvoiceApp.Data;
 using InvoiceApp.Models;
+using InvoiceApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,10 @@ namespace InvoiceApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Add User Services - For retrieving the current user
+            builder.Services.AddHttpContextAccessor();
+            //builder.Services.AddScoped<UserService>();
+
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
@@ -22,6 +27,7 @@ namespace InvoiceApp
             builder.Services.AddScoped<IdentityUserAccessor>();
             builder.Services.AddScoped<IdentityRedirectManager>();
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
                     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -35,9 +41,6 @@ namespace InvoiceApp
             //var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
             //builder.Services.AddDbContext<ApplicationDbContext>(options =>
             //    options.UseSqlServer(connectionString));
-
-            //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            //    options.UseSqlite("Data Source=C:\\Users\\jvand\\source\\repos\\InvoiceApp\\InvoiceDatabase.db3"));
 
             builder.Services.AddQuickGridEntityFrameworkAdapter();
 

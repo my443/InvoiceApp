@@ -1,0 +1,49 @@
+﻿@page "/images/create"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Image</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Image" OnValidSubmit="AddImage" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="filename" class="form-label">FileName:</label> 
+                <InputText id="filename" @bind-Value="Image.FileName" class="form-control" /> 
+                <ValidationMessage For="() => Image.FileName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="uploadtime" class="form-label">UploadTime:</label> 
+                <InputDate id="uploadtime" @bind-Value="Image.UploadTime" class="form-control" /> 
+                <ValidationMessage For="() => Image.UploadTime" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/images">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Image Image { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddImage()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Images.Add(Image);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/images");
+    }
+}

@@ -1,0 +1,48 @@
+﻿@page "/approvals/details"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Approval</h2>
+    <hr />
+    @if (approval is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">DateApproved</dt>
+            <dd class="col-sm-10">@approval.DateApproved</dd>
+            <dt class="col-sm-2">IsApproved</dt>
+            <dd class="col-sm-10">@approval.IsApproved</dd>
+        </dl>
+        <div>
+            <a href="@($"/approvals/edit?id={approval.Id}")">Edit</a> |
+            <a href="@($"/approvals")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Approval? approval;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        approval = await context.Approvals.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (approval is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

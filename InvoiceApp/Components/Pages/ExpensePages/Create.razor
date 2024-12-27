@@ -1,0 +1,49 @@
+﻿@page "/expenses/create"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Expense</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Expense" OnValidSubmit="AddExpense" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="totalamount" class="form-label">TotalAmount:</label> 
+                <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" /> 
+                <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="totalhst" class="form-label">TotalHst:</label> 
+                <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" /> 
+                <ValidationMessage For="() => Expense.TotalHst" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/expenses">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Expense Expense { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddExpense()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Expenses.Add(Expense);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/expenses");
+    }
+}

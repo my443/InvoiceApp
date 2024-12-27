@@ -1,0 +1,48 @@
+﻿@page "/images/details"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Image</h2>
+    <hr />
+    @if (image is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">FileName</dt>
+            <dd class="col-sm-10">@image.FileName</dd>
+            <dt class="col-sm-2">UploadTime</dt>
+            <dd class="col-sm-10">@image.UploadTime</dd>
+        </dl>
+        <div>
+            <a href="@($"/images/edit?id={image.Id}")">Edit</a> |
+            <a href="@($"/images")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Image? image;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        image = await context.Images.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (image is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

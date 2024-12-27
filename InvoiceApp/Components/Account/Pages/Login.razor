@@ -4,11 +4,14 @@
 @using Microsoft.AspNetCore.Authentication
 @using Microsoft.AspNetCore.Identity
 @using InvoiceApp.Models
+@using Microsoft.AspNetCore.Components.Rendering
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
-@inject IdentityRedirectManager RedirectManager
+@inject IdentityRedirectManager RedirectManager 
+@inject IHttpContextAccessor HttpContextAccessor
+
 
 <PageTitle>Log in</PageTitle>
 
@@ -93,6 +96,7 @@
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
+            ReturnUrl ??= "notes";
             RedirectManager.RedirectTo(ReturnUrl);
         }
         else if (result.RequiresTwoFactor)

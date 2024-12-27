@@ -1,0 +1,37 @@
+﻿@page "/approvals"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using InvoiceApp.Models
+@using InvoiceApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="approvals/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Approvals">
+    <PropertyColumn Property="approval => approval.DateApproved" />
+    <PropertyColumn Property="approval => approval.IsApproved" />
+
+    <TemplateColumn Context="approval">
+        <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> |
+        <a href="@($"approvals/details?id={approval.Id}")">Details</a> |
+        <a href="@($"approvals/delete?id={approval.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

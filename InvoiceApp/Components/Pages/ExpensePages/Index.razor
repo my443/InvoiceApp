@@ -1,0 +1,37 @@
+﻿@page "/expenses"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using InvoiceApp.Models
+@using InvoiceApp.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="expenses/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Expenses">
+    <PropertyColumn Property="expense => expense.TotalAmount" />
+    <PropertyColumn Property="expense => expense.TotalHst" />
+
+    <TemplateColumn Context="expense">
+        <a href="@($"expenses/edit?id={expense.Id}")">Edit</a> |
+        <a href="@($"expenses/details?id={expense.Id}")">Details</a> |
+        <a href="@($"expenses/delete?id={expense.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private ApplicationDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -1,6 +1,8 @@
 ﻿@page "/expenses/create"
 @using Microsoft.EntityFrameworkCore
 @using InvoiceApp.Models
+@using InvoiceApp.ViewModels
+@using InvoiceApp.Data
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 
@@ -24,7 +26,12 @@
                 <label for="totalhst" class="form-label">TotalHst:</label> 
                 <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" /> 
                 <ValidationMessage For="() => Expense.TotalHst" class="text-danger" /> 
-            </div>        
+            </div>
+            <div class="mb-3">
+                <label for="totalhst" class="form-label">Vendor:</label>
+                <InputText id="totalhst" @bind-Value="Expense.Vendor" class="form-control" />
+                <ValidationMessage For="() => Expense.Vendor" class="text-danger" />
+            </div>
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>
     </div>
@@ -38,17 +45,42 @@
     [SupplyParameterFromForm]
     private Expense Expense { get; set; } = new();
 
-    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task AddExpense()
-    {
-        using var context = DbFactory.CreateDbContext();
-        
-        Expense.Vendor = "Some Vendor";
-        Expense.SubmittedBy = context.Employees.FirstOrDefault(e => e.Id == 1);
-        Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id ==1);
+    private Employee? _employee { get; set; }
+    private ExpenseViewModel _expenseViewModel;
+    private ApplicationDbContext context;
 
-        context.Expenses.Add(Expense);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/expenses");
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = DbFactory.CreateDbContext();
+        _expenseViewModel = new ExpenseViewModel(context);
+
+        var _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 1);
+        if (_employee != null)
+        {
+            Expense.SubmittedBy = _employee;
+        }
+
+        ExpenseStatus expenseStatus = await context.ExpenseStatus.FirstOrDefaultAsync(ex => ex.Id == 1);
+        Expense.ExpenseStatus = expenseStatus;
+
+    }
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    // private async Task AddExpense()
+    // {
+    //     using var context = DbFactory.CreateDbContext();
+
+    //     Expense.Vendor = "Some Vendor";
+    //     Expense.SubmittedBy = context.Employees.FirstOrDefault(e => e.Id == 1);
+    //     Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id ==1);
+
+    //     context.Expenses.Add(Expense);
+    //     await context.SaveChangesAsync();
+    //     NavigationManager.NavigateTo("/expenses");
+    // }
+
+    private async Task AddExpense() {
+        Expense newExpense = _expenseViewModel.CreateExpense(Expense);
+        _expenseViewModel.AddExpense(newExpense);
     }
 }

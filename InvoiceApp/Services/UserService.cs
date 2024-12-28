@@ -29,6 +29,10 @@ namespace InvoiceApp.Services
         public async Task<Employee> GetCurrentEmployee()
         {
             ApplicationUser user = await GetCurrentUserAsync();
+            if (user == null || user.EmployeeId == 0)
+            {
+                return new Employee { FullName = "No Employee" };
+            }
             return await _context.Employees.FirstOrDefaultAsync(e => e.Id == user.EmployeeId);
         }
 

@@ -15,7 +15,7 @@ namespace InvoiceApp.Models
         public decimal TotalAmount { get; set; }
         [Precision(18, 2)]
         public decimal TotalHst { get; set; }
-        public Vendor Vendor { get; set; }
+        public string Vendor { get; set; }
         public Employee SubmittedBy { get; set; }
         public List<Approval> Approvals { get; set; } = new List<Approval>();
         public List<Note> Notes { get; set; } = new List<Note>();

@@ -42,6 +42,11 @@
     private async Task AddExpense()
     {
         using var context = DbFactory.CreateDbContext();
+        
+        Expense.Vendor = "Some Vendor";
+        Expense.SubmittedBy = context.Employees.FirstOrDefault(e => e.Id == 1);
+        Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id ==1);
+
         context.Expenses.Add(Expense);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/expenses");

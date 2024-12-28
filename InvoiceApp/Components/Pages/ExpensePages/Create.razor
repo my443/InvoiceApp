@@ -5,6 +5,7 @@
 @using InvoiceApp.Data
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>Create</PageTitle>
 
@@ -12,6 +13,11 @@
 
 <h2>Expense</h2>
 <hr />
+
+<button @onclick='() => _expenseViewModel.ToggleSection("ExpenseSummary")' class="btn btn-secondary">Toggle Expense Summary</button>
+<p>@_expenseViewModel.sectionVisibility["ExpenseSummary"]</p>
+
+@if(_expenseViewModel.sectionVisibility["ExpenseSummary"]){
 <div class="row">
     <div class="col-md-4">
         <EditForm method="post" Model="Expense" OnValidSubmit="AddExpense" FormName="create" Enhance>
@@ -36,7 +42,7 @@
         </EditForm>
     </div>
 </div>
-
+    }
 <div>
     <a href="/expenses">Back to List</a>
 </div>

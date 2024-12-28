@@ -14,7 +14,14 @@ namespace InvoiceApp.ViewModels
         [Precision(18, 2)]
         public decimal TotalHst { get; set; }
 
-        public ExpenseViewModel(ApplicationDbContext appDbContext) {
+        public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
+            {
+                { "ExpenseSummary", true },
+                { "ExpenseDetails", true }
+            };
+
+        public ExpenseViewModel(ApplicationDbContext appDbContext)
+        {
             UserCanApprove = false;
             UserCanProcess = false;
             _appDbContext = appDbContext;
@@ -27,7 +34,7 @@ namespace InvoiceApp.ViewModels
 
         public void SetCanApprove(bool status)
         {
-            UserCanApprove= status;
+            UserCanApprove = status;
         }
 
         public bool GetCanProcess()
@@ -37,16 +44,17 @@ namespace InvoiceApp.ViewModels
 
         public void SetCanProcess(bool status)
         {
-            UserCanProcess= status;
+            UserCanProcess = status;
         }
 
-        public void AddExpense(Expense expense) {
+        public void AddExpense(Expense expense)
+        {
             _appDbContext.Expenses.Add(expense);
             _appDbContext.SaveChanges();
         }
 
         public Expense CreateExpense(Expense newExpense)
-        {         
+        {
             return newExpense;
         }
 
@@ -119,6 +127,18 @@ namespace InvoiceApp.ViewModels
                 };
 
                 expense.ExpenseDetails.Add(balancingDetail);
+            }
+        }
+
+        /// <summary>
+        /// Toggles the visibility of a section. Based on the section name that is part of the dictionary.
+        /// </summary>
+        /// <param name="sectionName"></param>
+        public void ToggleSection(string sectionName)
+        {
+            if (sectionVisibility.ContainsKey(sectionName))
+            {
+                sectionVisibility[sectionName] = !sectionVisibility[sectionName];
             }
         }
     }

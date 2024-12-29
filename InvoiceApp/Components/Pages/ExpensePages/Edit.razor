@@ -1,8 +1,11 @@
 ﻿@page "/expenses/edit"
 @using Microsoft.EntityFrameworkCore
 @using InvoiceApp.Models
+@using InvoiceApp.Data
+@using InvoiceApp.ViewModels
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
 
@@ -38,6 +41,35 @@ else
     </div>
 }
 
+
+<!-- Button to trigger modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+    Add Note
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="newNote" OnValidSubmit="AddNote">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
+                    <div class="mb-3">
+                        <label for="noteText" class="form-label">Note:</label>
+                        <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" />
+                        <ValidationMessage For="() => newNote.NoteText" class="text-danger" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+</div>
 <div>
     <a href="/expenses">Back to List</a>
 </div>
@@ -45,18 +77,29 @@ else
 @code {
     [SupplyParameterFromQuery]
     private int Id { get; set; }
+    private Note newNote = new Note();
+
+    private Employee? _employee { get; set; }
+    private ExpenseViewModel _expenseViewModel;
+    private ApplicationDbContext context;
 
     [SupplyParameterFromForm]
     private Expense? Expense { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        using var context = DbFactory.CreateDbContext();
+        context = DbFactory.CreateDbContext();
         Expense ??= await context.Expenses.FirstOrDefaultAsync(m => m.Id == Id);
 
         if (Expense is null)
         {
             NavigationManager.NavigateTo("notfound");
+        }
+
+        _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 1);
+        if (_employee != null)
+        {
+            Expense.SubmittedBy = _employee;
         }
     }
 
@@ -64,7 +107,7 @@ else
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
     private async Task UpdateExpense()
     {
-        using var context = DbFactory.CreateDbContext();
+        // using var context = DbFactory.CreateDbContext();
         context.Attach(Expense!).State = EntityState.Modified;
 
         try
@@ -88,7 +131,22 @@ else
 
     private bool ExpenseExists(int id)
     {
-        using var context = DbFactory.CreateDbContext();
+        // using var context = DbFactory.CreateDbContext();
         return context.Expenses.Any(e => e.Id == id);
+    }
+
+    private async Task AddNote()
+    {
+        int expenseId = Expense.Id; 
+
+        newNote.WrittenBy = _employee;
+        newNote.DateAdded = DateTime.Now;
+        newNote.ExpenseId = expenseId;
+
+
+        Console.WriteLine($"{newNote.NoteText}, {newNote.WrittenBy}");
+        context.Notes.Add(newNote);
+        await context.SaveChangesAsync();
+        newNote = new Note(); // Reset the note
     }
 }

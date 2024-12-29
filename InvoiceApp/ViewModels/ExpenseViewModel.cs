@@ -47,10 +47,11 @@ namespace InvoiceApp.ViewModels
             UserCanProcess = status;
         }
 
-        public void AddExpense(Expense expense)
+        public int AddExpense(Expense expense)
         {
             _appDbContext.Expenses.Add(expense);
             _appDbContext.SaveChanges();
+            return expense.Id;
         }
 
         public Expense CreateExpense(Expense newExpense)

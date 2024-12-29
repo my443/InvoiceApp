@@ -12,5 +12,7 @@ namespace InvoiceApp.Models
         public Employee WrittenBy { get; set; }
         public string NoteText { get; set; }
         public DateTime DateAdded { get; set; } = DateTime.Now;
+
+        public int ExpenseId { get; set; }
     }
 }

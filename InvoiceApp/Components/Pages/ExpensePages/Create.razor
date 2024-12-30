@@ -66,13 +66,13 @@
         _expenseViewModel = new ExpenseViewModel(context);
 
         Expense.Vendor = "<<No Vendor Added>>";         // Default value
-        _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 1);
+        _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 2);
         if (_employee != null)
         {
             Expense.SubmittedBy = _employee;
         }
 
-        ExpenseStatus expenseStatus = await context.ExpenseStatus.FirstOrDefaultAsync(ex => ex.Id == 1);
+        ExpenseStatus expenseStatus = await context.ExpenseStatus.FirstOrDefaultAsync(ex => ex.Id == 2);
         Expense.ExpenseStatus = expenseStatus;
 
     }

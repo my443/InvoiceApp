@@ -24,8 +24,8 @@ else
                 <input type="hidden" name="Approval.Id" value="@Approval.Id" />
                 <div class="mb-3">
                     <label for="dateapproved" class="form-label">DateApproved:</label>
-                    <InputDate id="dateapproved" @bind-Value="Approval.DateApproved" class="form-control" />
-                    <ValidationMessage For="() => Approval.DateApproved" class="text-danger" />
+                    <InputDate id="dateapproved" @bind-Value="Approval.LastUpdated" class="form-control" />
+                    <ValidationMessage For="() => Approval.LastUpdated" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="isapproved" class="form-label">IsApproved:</label>

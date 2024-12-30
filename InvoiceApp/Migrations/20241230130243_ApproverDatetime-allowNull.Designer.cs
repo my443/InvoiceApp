@@ -3,6 +3,7 @@ using System;
 using InvoiceApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241230130243_ApproverDatetime-allowNull")]
+    partial class ApproverDatetimeallowNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -93,14 +96,14 @@ namespace InvoiceApp.Migrations
                     b.Property<int>("ApproverId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("ExpenseId")
+                    b.Property<DateTime?>("DateApproved")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("ExpenseId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsApproved")
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime?>("LastUpdated")
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -516,9 +519,7 @@ namespace InvoiceApp.Migrations
 
                     b.HasOne("InvoiceApp.Models.Expense", null)
                         .WithMany("Approvals")
-                        .HasForeignKey("ExpenseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ExpenseId");
 
                     b.Navigation("Approver");
                 });

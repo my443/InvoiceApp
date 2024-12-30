@@ -1,0 +1,54 @@
+﻿@page "/employees/details"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Employee</h2>
+    <hr />
+    @if (employee is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">EE_ID</dt>
+            <dd class="col-sm-10">@employee.EE_ID</dd>
+            <dt class="col-sm-2">FullName</dt>
+            <dd class="col-sm-10">@employee.FullName</dd>
+            <dt class="col-sm-2">EmailAddress</dt>
+            <dd class="col-sm-10">@employee.EmailAddress</dd>
+            <dt class="col-sm-2">ApprovalLimit</dt>
+            <dd class="col-sm-10">@employee.ApprovalLimit</dd>
+            <dt class="col-sm-2">IsProcessor</dt>
+            <dd class="col-sm-10">@employee.IsProcessor</dd>
+        </dl>
+        <div>
+            <a href="@($"/employees/edit?id={employee.Id}")">Edit</a> |
+            <a href="@($"/employees")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Employee? employee;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        employee = await context.Employees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (employee is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

@@ -1,0 +1,64 @@
+﻿@page "/employees/create"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Employee</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Employee" OnValidSubmit="AddEmployee" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="ee_id" class="form-label">EE_ID:</label> 
+                <InputText id="ee_id" @bind-Value="Employee.EE_ID" class="form-control" /> 
+                <ValidationMessage For="() => Employee.EE_ID" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="fullname" class="form-label">FullName:</label> 
+                <InputText id="fullname" @bind-Value="Employee.FullName" class="form-control" /> 
+                <ValidationMessage For="() => Employee.FullName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="emailaddress" class="form-label">EmailAddress:</label> 
+                <InputText id="emailaddress" @bind-Value="Employee.EmailAddress" class="form-control" /> 
+                <ValidationMessage For="() => Employee.EmailAddress" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="approvallimit" class="form-label">ApprovalLimit:</label> 
+                <InputNumber id="approvallimit" @bind-Value="Employee.ApprovalLimit" class="form-control" /> 
+                <ValidationMessage For="() => Employee.ApprovalLimit" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="isprocessor" class="form-label">IsProcessor:</label> 
+                <InputCheckbox id="isprocessor" @bind-Value="Employee.IsProcessor" class="form-check-input" /> 
+                <ValidationMessage For="() => Employee.IsProcessor" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/employees">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Employee Employee { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEmployee()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Employees.Add(Employee);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/employees");
+    }
+}

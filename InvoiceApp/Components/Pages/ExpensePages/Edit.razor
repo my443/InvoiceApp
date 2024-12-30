@@ -41,7 +41,15 @@ else
     </div>
 }
 
+<button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
+<InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
 
+<InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
+    <option value="">-- Select an Employee --</option>
+    @foreach (var employee in filteredEmployees)    {
+        <option value="@employee.Id">@employee.FullName</option>
+    }
+</InputSelect>
 <!-- Button to trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
     Add Note
@@ -86,6 +94,13 @@ else
     [SupplyParameterFromForm]
     private Expense? Expense { get; set; }
 
+
+    private string employeeSearchTerm = string.Empty;
+    private int selectedEmployeeId;
+    private List<Employee> employees = new List<Employee>();
+    private List<Employee> filteredEmployees = new List<Employee>();
+
+
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
@@ -96,11 +111,14 @@ else
             NavigationManager.NavigateTo("notfound");
         }
 
-        _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 1);
+        _employee = await context.Employees.FirstOrDefaultAsync(e => e.Id == 2);
         if (_employee != null)
         {
             Expense.SubmittedBy = _employee;
         }
+
+        employees = await context.Employees.ToListAsync();
+        filteredEmployees = employees;
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -148,5 +166,28 @@ else
         context.Notes.Add(newNote);
         await context.SaveChangesAsync();
         newNote = new Note(); // Reset the note
+    }
+
+    private async Task AddApproval()
+    {
+        Employee approver = await context.Employees.FirstOrDefaultAsync(e => e.Id == selectedEmployeeId);
+
+        var approval = new Approval { 
+                Approver = _employee,
+                LastUpdated = DateTime.Now,
+                IsApproved = false,
+                ExpenseId = Expense.Id
+        };
+
+        context.Approvals.Add(approval);
+        await context.SaveChangesAsync();
+    }
+
+    private void FilterEmployees(ChangeEventArgs e)
+    {
+        employeeSearchTerm = e.Value.ToString();
+        filteredEmployees = employees
+            .Where(emp => emp.FullName.Contains(employeeSearchTerm, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 }

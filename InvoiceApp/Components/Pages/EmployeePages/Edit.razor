@@ -1,0 +1,109 @@
+﻿@page "/employees/edit"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Employee</h2>
+<hr />
+@if (Employee is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Employee" OnValidSubmit="UpdateEmployee" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Employee.Id" value="@Employee.Id" />
+                <div class="mb-3">
+                    <label for="ee_id" class="form-label">EE_ID:</label>
+                    <InputText id="ee_id" @bind-Value="Employee.EE_ID" class="form-control" />
+                    <ValidationMessage For="() => Employee.EE_ID" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="fullname" class="form-label">FullName:</label>
+                    <InputText id="fullname" @bind-Value="Employee.FullName" class="form-control" />
+                    <ValidationMessage For="() => Employee.FullName" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="emailaddress" class="form-label">EmailAddress:</label>
+                    <InputText id="emailaddress" @bind-Value="Employee.EmailAddress" class="form-control" />
+                    <ValidationMessage For="() => Employee.EmailAddress" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="approvallimit" class="form-label">ApprovalLimit:</label>
+                    <InputNumber id="approvallimit" @bind-Value="Employee.ApprovalLimit" class="form-control" />
+                    <ValidationMessage For="() => Employee.ApprovalLimit" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isprocessor" class="form-label">IsProcessor:</label>
+                    <InputCheckbox id="isprocessor" @bind-Value="Employee.IsProcessor" class="form-check-input" />
+                    <ValidationMessage For="() => Employee.IsProcessor" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/employees">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Employee? Employee { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Employee ??= await context.Employees.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Employee is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateEmployee()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Employee!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!EmployeeExists(Employee!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/employees");
+    }
+
+    private bool EmployeeExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Employees.Any(e => e.Id == id);
+    }
+}

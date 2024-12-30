@@ -5,6 +5,7 @@
 @using InvoiceApp.ViewModels
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
+@inject IWebHostEnvironment WebHostEnvironment
 @rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
@@ -79,6 +80,13 @@ else
     </div>
 </div>
 <div>
+
+    <!-- File Upload -->
+    <div class="mb-3">
+        <label for="fileUpload" class="form-label">Upload Attachment:</label>
+        <InputFile id="fileUpload" OnChange="HandleFileSelected" />
+    </div>
+
     <a href="/expenses">Back to List</a>
 </div>
 
@@ -189,5 +197,16 @@ else
         filteredEmployees = employees
             .Where(emp => emp.FullName.Contains(employeeSearchTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
+    }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var uploadsFolder = Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads");
+        Directory.CreateDirectory(uploadsFolder);
+        var filePath = Path.Combine(uploadsFolder, file.Name);
+
+        await using var fileStream = new FileStream(filePath, FileMode.Create);
+        await file.OpenReadStream().CopyToAsync(fileStream);
     }
 }

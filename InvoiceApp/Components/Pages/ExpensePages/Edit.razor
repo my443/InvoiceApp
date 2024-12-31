@@ -3,9 +3,16 @@
 @using InvoiceApp.Models
 @using InvoiceApp.Data
 @using InvoiceApp.ViewModels
+
+@using System.Net.Http.Headers
+@using System.Net
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.AspNetCore.Mvc.Infrastructure
+
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment WebHostEnvironment
+@inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
 <PageTitle>Edit</PageTitle>
@@ -24,7 +31,7 @@ else
         <div class="col-md-4">
             <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
-                <ValidationSummary role="alert"/>
+                <ValidationSummary role="alert" />
                 <input type="hidden" name="Expense.Id" value="@Expense.Id" />
                 <div class="mb-3">
                     <label for="totalamount" class="form-label">TotalAmount:</label>
@@ -47,7 +54,8 @@ else
 
 <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
     <option value="">-- Select an Employee --</option>
-    @foreach (var employee in filteredEmployees)    {
+    @foreach (var employee in filteredEmployees)
+    {
         <option value="@employee.Id">@employee.FullName</option>
     }
 </InputSelect>
@@ -87,8 +95,34 @@ else
         <InputFile id="fileUpload" OnChange="HandleFileSelected" />
     </div>
 
+    @if (_images.Any())
+    {
+        <h3>Attached Images</h3>
+        <div class="row">
+            @foreach (var image in _images)
+            {
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <button class="btn btn-link" @onclick="() => DownloadFile(image.Id)">
+                            <img src="api/file/@image.FileName" class="card-img-top" alt="@image.FileName" />
+                        </button>
+                        <div class="card-body">
+                            <p class="card-text">@image.FileName</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No images attached to this expense.</p>
+    }
+
     <a href="/expenses">Back to List</a>
 </div>
+
+
 
 @code {
     [SupplyParameterFromQuery]
@@ -107,6 +141,9 @@ else
     private int selectedEmployeeId;
     private List<Employee> employees = new List<Employee>();
     private List<Employee> filteredEmployees = new List<Employee>();
+
+    private List<Approval> _approvals = new List<Approval>();
+    private List<Image> _images = new List<Image>();
 
 
     protected override async Task OnInitializedAsync()
@@ -127,6 +164,12 @@ else
 
         employees = await context.Employees.ToListAsync();
         filteredEmployees = employees;
+
+        _images = await context.Images
+            .Where(img => img.ExpenseId == Expense.Id)
+            .ToListAsync();
+
+        _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -163,7 +206,7 @@ else
 
     private async Task AddNote()
     {
-        int expenseId = Expense.Id; 
+        int expenseId = Expense.Id;
 
         newNote.WrittenBy = _employee;
         newNote.DateAdded = DateTime.Now;
@@ -180,12 +223,13 @@ else
     {
         Employee approver = await context.Employees.FirstOrDefaultAsync(e => e.Id == selectedEmployeeId);
 
-        var approval = new Approval { 
+        var approval = new Approval
+            {
                 Approver = _employee,
                 LastUpdated = DateTime.Now,
                 IsApproved = false,
                 ExpenseId = Expense.Id
-        };
+            };
 
         context.Approvals.Add(approval);
         await context.SaveChangesAsync();
@@ -201,12 +245,69 @@ else
 
     private async Task HandleFileSelected(InputFileChangeEventArgs e)
     {
-        var file = e.File;
+        IBrowserFile file = e.File;
+
+        // Save to Database. Get Filename
+        int imageDbID = SaveFilenameRecordToDatabase(file);
+        string filename = $"{imageDbID.ToString()}-{file.Name}";
+
         var uploadsFolder = Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads");
         Directory.CreateDirectory(uploadsFolder);
-        var filePath = Path.Combine(uploadsFolder, file.Name);
+        var filePath = Path.Combine(uploadsFolder, filename);
 
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await file.OpenReadStream().CopyToAsync(fileStream);
+    }
+
+    private int SaveFilenameRecordToDatabase(IBrowserFile file)
+    {
+        // Get the file extension
+        string fileExtension = Path.GetExtension(file.Name);
+        FileType fileType = GetFileType(fileExtension);
+
+        // Save the image record to the database
+        var image = new Image
+            {
+                FileName = file.Name,
+                UploadTime = DateTime.Now,
+                UploadedBy = _employee,
+                ExpenseId = Expense.Id,
+                FileType = fileType,
+            };
+
+        context.Images.Add(image);
+        context.SaveChanges();   // Save the filename to the database
+
+        return image.Id;
+    }
+
+    // Returns FileType or default to 'Other'
+    private FileType GetFileType(string fileExtension)
+    {
+        FileType fileType = context.FileTypes.FirstOrDefault(ft => ft.Extension == fileExtension);
+
+        if (fileType is null)
+        {
+            fileType = context.FileTypes.FirstOrDefault(ft => ft.Id == -1); // Default to 'Other'
+        }
+
+        return fileType;
+    }
+
+    private async Task DownloadFile(int imageId)
+    {
+        var image = await context.Images
+            .Where(img => img.Id == imageId)
+            .FirstOrDefaultAsync();
+
+        string fileName = $"{image.Id}-{image.FileName}";
+        Console.WriteLine(fileName);
+
+        var filePath = Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads", fileName);
+
+        var fileBytes = await File.ReadAllBytesAsync(filePath);
+
+        var base64 = Convert.ToBase64String(fileBytes);
+        await JSRuntime.InvokeVoidAsync("openFileFromBase64", fileName, base64);
     }
 }

@@ -1,5 +1,7 @@
 ﻿using InvoiceApp.Data;
 using InvoiceApp.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.ViewModels
@@ -142,5 +144,6 @@ namespace InvoiceApp.ViewModels
                 sectionVisibility[sectionName] = !sectionVisibility[sectionName];
             }
         }
+
     }
 }

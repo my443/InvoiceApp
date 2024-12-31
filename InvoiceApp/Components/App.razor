@@ -11,6 +11,18 @@
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
+
+    <script>
+        function openFileFromBase64(fileName, base64) {
+            const link = document.createElement('a');
+            link.href = `data:application/octet-stream;base64,${base64}`;
+            link.download = fileName;
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </head>
 
 <body>

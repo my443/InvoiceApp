@@ -13,5 +13,8 @@ namespace InvoiceApp.Models
         public DateTime UploadTime { get; set; }
         public Employee UploadedBy { get; set; }
         public FileType FileType { get; set; }
+
+        // Foreign key for Expense
+        public int ExpenseId { get; set; }
     }
 }

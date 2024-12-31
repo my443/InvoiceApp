@@ -17,6 +17,7 @@
 <QuickGrid Class="table" Items="context.Images">
     <PropertyColumn Property="image => image.FileName" />
     <PropertyColumn Property="image => image.UploadTime" />
+    <PropertyColumn Property="image => image.ExpenseId" />
 
     <TemplateColumn Context="image">
         <a href="@($"images/edit?id={image.Id}")">Edit</a> |

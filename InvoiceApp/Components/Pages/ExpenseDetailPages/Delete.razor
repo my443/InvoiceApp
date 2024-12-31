@@ -1,0 +1,63 @@
+﻿@page "/expensedetails/delete"
+@using Microsoft.EntityFrameworkCore
+@using InvoiceApp.Models
+@inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Delete</PageTitle>
+
+<h1>Delete</h1>
+
+<p>Are you sure you want to delete this?</p>
+<div>
+    <h2>ExpenseDetail</h2>
+    <hr />
+    @if (expensedetail is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">Hst</dt>
+            <dd class="col-sm-10">@expensedetail.Hst</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">Amount</dt>
+            <dd class="col-sm-10">@expensedetail.Amount</dd>
+        </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ExpenseId</dt>
+            <dd class="col-sm-10">@expensedetail.ExpenseId</dd>
+        </dl>
+        <EditForm method="post" Model="expensedetail" OnValidSubmit="DeleteExpenseDetail" FormName="delete" Enhance>
+            <button type="submit" class="btn btn-danger" disabled="@(expensedetail is null)">Delete</button> |
+            <a href="/expensedetails">Back to List</a>
+        </EditForm>
+    }
+</div>
+
+@code {
+    private ExpenseDetail? expensedetail;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        expensedetail = await context.ExpenseDetails.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (expensedetail is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    private async Task DeleteExpenseDetail()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.ExpenseDetails.Remove(expensedetail!);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/expensedetails");
+    }
+}

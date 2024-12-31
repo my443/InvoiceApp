@@ -17,13 +17,18 @@
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="mb-3">
                 <label for="notetext" class="form-label">NoteText:</label> 
-                <InputTextArea id="notetext" @bind-Value="Note.NoteText" class="form-control" />
+                <InputText id="notetext" @bind-Value="Note.NoteText" class="form-control" /> 
                 <ValidationMessage For="() => Note.NoteText" class="text-danger" /> 
             </div>        
             <div class="mb-3">
                 <label for="dateadded" class="form-label">DateAdded:</label> 
                 <InputDate id="dateadded" @bind-Value="Note.DateAdded" class="form-control" /> 
                 <ValidationMessage For="() => Note.DateAdded" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="expenseid" class="form-label">ExpenseId:</label> 
+                <InputNumber id="expenseid" @bind-Value="Note.ExpenseId" class="form-control" /> 
+                <ValidationMessage For="() => Note.ExpenseId" class="text-danger" /> 
             </div>        
             <button type="submit" class="btn btn-primary">Create</button>
         </EditForm>

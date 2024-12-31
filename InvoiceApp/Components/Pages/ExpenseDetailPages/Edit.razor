@@ -1,4 +1,4 @@
-﻿@page "/images/edit"
+﻿@page "/expensedetails/edit"
 @using Microsoft.EntityFrameworkCore
 @using InvoiceApp.Models
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
@@ -8,9 +8,9 @@
 
 <h1>Edit</h1>
 
-<h2>Image</h2>
+<h2>ExpenseDetail</h2>
 <hr />
-@if (Image is null)
+@if (ExpenseDetail is null)
 {
     <p><em>Loading...</em></p>
 }
@@ -18,24 +18,24 @@ else
 {
     <div class="row">
         <div class="col-md-4">
-            <EditForm method="post" Model="Image" OnValidSubmit="UpdateImage" FormName="edit" Enhance>
+            <EditForm method="post" Model="ExpenseDetail" OnValidSubmit="UpdateExpenseDetail" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
                 <ValidationSummary role="alert"/>
-                <input type="hidden" name="Image.Id" value="@Image.Id" />
+                <input type="hidden" name="ExpenseDetail.Id" value="@ExpenseDetail.Id" />
                 <div class="mb-3">
-                    <label for="filename" class="form-label">FileName:</label>
-                    <InputText id="filename" @bind-Value="Image.FileName" class="form-control" />
-                    <ValidationMessage For="() => Image.FileName" class="text-danger" />
+                    <label for="hst" class="form-label">Hst:</label>
+                    <InputNumber id="hst" @bind-Value="ExpenseDetail.Hst" class="form-control" />
+                    <ValidationMessage For="() => ExpenseDetail.Hst" class="text-danger" />
                 </div>
                 <div class="mb-3">
-                    <label for="uploadtime" class="form-label">UploadTime:</label>
-                    <InputDate id="uploadtime" @bind-Value="Image.UploadTime" class="form-control" />
-                    <ValidationMessage For="() => Image.UploadTime" class="text-danger" />
+                    <label for="amount" class="form-label">Amount:</label>
+                    <InputNumber id="amount" @bind-Value="ExpenseDetail.Amount" class="form-control" />
+                    <ValidationMessage For="() => ExpenseDetail.Amount" class="text-danger" />
                 </div>
                 <div class="mb-3">
                     <label for="expenseid" class="form-label">ExpenseId:</label>
-                    <InputNumber id="expenseid" @bind-Value="Image.ExpenseId" class="form-control" />
-                    <ValidationMessage For="() => Image.ExpenseId" class="text-danger" />
+                    <InputNumber id="expenseid" @bind-Value="ExpenseDetail.ExpenseId" class="form-control" />
+                    <ValidationMessage For="() => ExpenseDetail.ExpenseId" class="text-danger" />
                 </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
@@ -44,7 +44,7 @@ else
 }
 
 <div>
-    <a href="/images">Back to List</a>
+    <a href="/expensedetails">Back to List</a>
 </div>
 
 @code {
@@ -52,14 +52,14 @@ else
     private int Id { get; set; }
 
     [SupplyParameterFromForm]
-    private Image? Image { get; set; }
+    private ExpenseDetail? ExpenseDetail { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        Image ??= await context.Images.FirstOrDefaultAsync(m => m.Id == Id);
+        ExpenseDetail ??= await context.ExpenseDetails.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (Image is null)
+        if (ExpenseDetail is null)
         {
             NavigationManager.NavigateTo("notfound");
         }
@@ -67,10 +67,10 @@ else
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
     // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
-    private async Task UpdateImage()
+    private async Task UpdateExpenseDetail()
     {
         using var context = DbFactory.CreateDbContext();
-        context.Attach(Image!).State = EntityState.Modified;
+        context.Attach(ExpenseDetail!).State = EntityState.Modified;
 
         try
         {
@@ -78,7 +78,7 @@ else
         }
         catch (DbUpdateConcurrencyException)
         {
-            if (!ImageExists(Image!.Id))
+            if (!ExpenseDetailExists(ExpenseDetail!.Id))
             {
                 NavigationManager.NavigateTo("notfound");
             }
@@ -88,12 +88,12 @@ else
             }
         }
 
-        NavigationManager.NavigateTo("/images");
+        NavigationManager.NavigateTo("/expensedetails");
     }
 
-    private bool ImageExists(int id)
+    private bool ExpenseDetailExists(int id)
     {
         using var context = DbFactory.CreateDbContext();
-        return context.Images.Any(e => e.Id == id);
+        return context.ExpenseDetails.Any(e => e.Id == id);
     }
 }

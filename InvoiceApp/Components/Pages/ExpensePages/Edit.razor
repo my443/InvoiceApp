@@ -3,7 +3,7 @@
 @using InvoiceApp.Models
 @using InvoiceApp.Data
 @using InvoiceApp.ViewModels
-
+@using Microsoft.AspNetCore.Components.QuickGrid
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment WebHostEnvironment
@@ -83,7 +83,18 @@ else
     </div>
 </div>
 <div>
+    <QuickGrid Class="table" Items="_expenseViewModel.ExpenseDetails">
+        <PropertyColumn Property="expensedetail => expensedetail.Department" />
+        <PropertyColumn Property="expensedetail => expensedetail.Account" />
+        <PropertyColumn Property="expensedetail => expensedetail.Amount" />
+        <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" />
 
+        <TemplateColumn Context="expensedetail">
+            <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
+            @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
+            <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
     <!-- File Upload -->
     <div class="mb-3">
         <label for="fileUpload" class="form-label">Upload Attachment:</label>
@@ -148,6 +159,7 @@ else
 
         Expense ??= await context.Expenses.FirstOrDefaultAsync(m => m.Id == Id);
         _expenseViewModel.EnsureExpenseDetailsSum(Expense);
+        _expenseViewModel.GetExpenseDetails(Expense.Id);
 
         if (Expense is null)
         {

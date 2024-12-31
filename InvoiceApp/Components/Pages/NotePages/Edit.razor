@@ -32,6 +32,11 @@ else
                     <InputDate id="dateadded" @bind-Value="Note.DateAdded" class="form-control" />
                     <ValidationMessage For="() => Note.DateAdded" class="text-danger" />
                 </div>
+                <div class="mb-3">
+                    <label for="expenseid" class="form-label">ExpenseId:</label>
+                    <InputNumber id="expenseid" @bind-Value="Note.ExpenseId" class="form-control" />
+                    <ValidationMessage For="() => Note.ExpenseId" class="text-danger" />
+                </div>
                 <button type="submit" class="btn btn-primary">Save</button>
             </EditForm>
         </div>

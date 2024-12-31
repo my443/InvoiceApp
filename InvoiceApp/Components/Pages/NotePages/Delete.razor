@@ -25,6 +25,10 @@
             <dt class="col-sm-2">DateAdded</dt>
             <dd class="col-sm-10">@note.DateAdded</dd>
         </dl>
+        <dl class="row">
+            <dt class="col-sm-2">ExpenseId</dt>
+            <dd class="col-sm-10">@note.ExpenseId</dd>
+        </dl>
         <EditForm method="post" Model="note" OnValidSubmit="DeleteNote" FormName="delete" Enhance>
             <button type="submit" class="btn btn-danger" disabled="@(note is null)">Delete</button> |
             <a href="/notes">Back to List</a>

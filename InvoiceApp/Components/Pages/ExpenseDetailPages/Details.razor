@@ -1,4 +1,4 @@
-﻿@page "/images/details"
+﻿@page "/expensedetails/details"
 @using Microsoft.EntityFrameworkCore
 @using InvoiceApp.Models
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
@@ -9,30 +9,30 @@
 <h1>Details</h1>
 
 <div>
-    <h2>Image</h2>
+    <h2>ExpenseDetail</h2>
     <hr />
-    @if (image is null)
+    @if (expensedetail is null)
     {
         <p><em>Loading...</em></p>
     }
     else {
         <dl class="row">
-            <dt class="col-sm-2">FileName</dt>
-            <dd class="col-sm-10">@image.FileName</dd>
-            <dt class="col-sm-2">UploadTime</dt>
-            <dd class="col-sm-10">@image.UploadTime</dd>
+            <dt class="col-sm-2">Hst</dt>
+            <dd class="col-sm-10">@expensedetail.Hst</dd>
+            <dt class="col-sm-2">Amount</dt>
+            <dd class="col-sm-10">@expensedetail.Amount</dd>
             <dt class="col-sm-2">ExpenseId</dt>
-            <dd class="col-sm-10">@image.ExpenseId</dd>
+            <dd class="col-sm-10">@expensedetail.ExpenseId</dd>
         </dl>
         <div>
-            <a href="@($"/images/edit?id={image.Id}")">Edit</a> |
-            <a href="@($"/images")">Back to List</a>
+            <a href="@($"/expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
+            <a href="@($"/expensedetails")">Back to List</a>
         </div>
     }
 </div>
 
 @code {
-    private Image? image;
+    private ExpenseDetail? expensedetail;
 
     [SupplyParameterFromQuery]
     private int Id { get; set; }
@@ -40,9 +40,9 @@
     protected override async Task OnInitializedAsync()
     {
         using var context = DbFactory.CreateDbContext();
-        image = await context.Images.FirstOrDefaultAsync(m => m.Id == Id);
+        expensedetail = await context.ExpenseDetails.FirstOrDefaultAsync(m => m.Id == Id);
 
-        if (image is null)
+        if (expensedetail is null)
         {
             NavigationManager.NavigateTo("notfound");
         }

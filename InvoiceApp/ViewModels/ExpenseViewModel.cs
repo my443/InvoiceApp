@@ -16,6 +16,7 @@ namespace InvoiceApp.ViewModels
         public double TotalAmount { get; set; }
         [Precision(18, 2)]
         public double TotalHst { get; set; }
+        public IQueryable<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>().AsQueryable();
 
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
             {
@@ -104,10 +105,12 @@ namespace InvoiceApp.ViewModels
         }
 
         // Get the list of expense details for a specific expense
-        public List<ExpenseDetail> GetExpenseDetails(int expenseId)
+        public IQueryable<ExpenseDetail> GetExpenseDetails(int expenseId)
         {
-            Expense expense = _appDbContext.Expenses.FirstOrDefault(e => e.Id == expenseId);
-            return expense?.ExpenseDetails ?? new List<ExpenseDetail>();
+            List<ExpenseDetail> expenseDetails = _appDbContext.ExpenseDetails.Where(e => e.ExpenseId == expenseId).ToList();
+            ExpenseDetails = expenseDetails.AsQueryable();
+
+            return ExpenseDetails;
         }
 
         // Ensure that the sum of all ExpenseDetails is equal to the TotalAmount and TotalHst

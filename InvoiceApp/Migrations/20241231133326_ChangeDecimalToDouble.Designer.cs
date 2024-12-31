@@ -3,6 +3,7 @@ using System;
 using InvoiceApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InvoiceApp.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241231133326_ChangeDecimalToDouble")]
+    partial class ChangeDecimalToDouble
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -176,13 +179,13 @@ namespace InvoiceApp.Migrations
                     b.Property<int>("SubmittedById")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("TotalAmount")
+                    b.Property<double>("TotalAmount")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
-                    b.Property<decimal>("TotalHst")
+                    b.Property<double>("TotalHst")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.Property<string>("Vendor")
                         .IsRequired()
@@ -206,9 +209,9 @@ namespace InvoiceApp.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<double>("Amount")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("INTEGER");
@@ -216,9 +219,9 @@ namespace InvoiceApp.Migrations
                     b.Property<int>("ExpenseId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<decimal>("Hst")
+                    b.Property<double>("Hst")
                         .HasPrecision(18, 2)
-                        .HasColumnType("TEXT");
+                        .HasColumnType("REAL");
 
                     b.HasKey("Id");
 

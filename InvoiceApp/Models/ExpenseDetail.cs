@@ -13,9 +13,13 @@ namespace InvoiceApp.Models
         public int Id { get; set; }
         public GLAccount Account { get; set; }
         public Department Department { get; set; }
+
         [Precision(18, 2)]
-        public Decimal Hst {  get; set; }
+        public decimal Hst {  get; set; }
         [Precision(18, 2)]
-        public Decimal Amount { get; set; }
+        public decimal Amount { get; set; }
+
+        // For FK relationship
+        public int ExpenseId { get; set; }
     }
 }

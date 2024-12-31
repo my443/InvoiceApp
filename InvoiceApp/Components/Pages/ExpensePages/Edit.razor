@@ -4,11 +4,6 @@
 @using InvoiceApp.Data
 @using InvoiceApp.ViewModels
 
-@using System.Net.Http.Headers
-@using System.Net
-@using Microsoft.AspNetCore.Mvc
-@using Microsoft.AspNetCore.Mvc.Infrastructure
-
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
 @inject NavigationManager NavigationManager
 @inject IWebHostEnvironment WebHostEnvironment
@@ -149,7 +144,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
+        _expenseViewModel = new ExpenseViewModel(context);
+
         Expense ??= await context.Expenses.FirstOrDefaultAsync(m => m.Id == Id);
+        _expenseViewModel.EnsureExpenseDetailsSum(Expense);
 
         if (Expense is null)
         {

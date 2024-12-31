@@ -11,10 +11,11 @@ namespace InvoiceApp.ViewModels
         private readonly ApplicationDbContext _appDbContext;
         private bool UserCanApprove { get; set; }
         private bool UserCanProcess { get; set; }
+
         [Precision(18, 2)]
-        public decimal TotalAmount { get; set; }
+        public double TotalAmount { get; set; }
         [Precision(18, 2)]
-        public decimal TotalHst { get; set; }
+        public double TotalHst { get; set; }
 
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
             {
@@ -110,27 +111,38 @@ namespace InvoiceApp.ViewModels
         }
 
         // Ensure that the sum of all ExpenseDetails is equal to the TotalAmount and TotalHst
-        private void EnsureExpenseDetailsSum(Expense expense)
+        public void EnsureExpenseDetailsSum(Expense expense)
         {
-            decimal currentTotalAmount = expense.ExpenseDetails.Sum(ed => ed.Amount);
-            decimal currentTotalHst = expense.ExpenseDetails.Sum(ed => ed.Hst);
+            decimal currentDetailsAmountTotal = _appDbContext.ExpenseDetails.Sum(ed => ed.Amount);
+            decimal currentDetailsHstTotal = _appDbContext.ExpenseDetails.Sum(ed => ed.Hst);
 
-            if (currentTotalAmount != expense.TotalAmount || currentTotalHst != expense.TotalHst)
+
+            Console.WriteLine($"Current Details Amount Total: {currentDetailsAmountTotal}");
+            Console.WriteLine($"Current Details HST Total: {currentDetailsHstTotal}");
+
+            if (currentDetailsAmountTotal != expense.TotalAmount || currentDetailsHstTotal != expense.TotalHst)
             {
-                decimal amountDifference = expense.TotalAmount - currentTotalAmount;
-                decimal hstDifference = expense.TotalHst - currentTotalHst;
+                decimal amountDifference = expense.TotalAmount - currentDetailsAmountTotal;
+                decimal hstDifference = expense.TotalHst - currentDetailsHstTotal;
+
+                GLAccount glAccount = _appDbContext.GLAccounts.FirstOrDefault(a => a.Id == -1);
+                Department department = _appDbContext.Departments.FirstOrDefault(d => d.Id == -1);
 
                 // Add a new ExpenseDetail to balance the amounts
                 ExpenseDetail balancingDetail = new ExpenseDetail
                 {
-                    Account = null, // Set appropriate GLAccount
-                    Department = null, // Set appropriate Department
+                    Account = glAccount, // Set appropriate GLAccount
+                    Department = department, // Set appropriate Department
                     Amount = amountDifference,
-                    Hst = hstDifference
+                    Hst = hstDifference,
+                    ExpenseId = expense.Id
                 };
 
                 expense.ExpenseDetails.Add(balancingDetail);
+                _appDbContext.SaveChanges();
             }
+
+
         }
 
         /// <summary>

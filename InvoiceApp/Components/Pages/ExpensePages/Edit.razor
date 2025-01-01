@@ -12,10 +12,19 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h1>Edit</h1>
-
-<h2>Expense</h2>
+<h2>Expense Details</h2>
 <hr />
+
+<div class="row">
+    <div class="text-end">
+        <!-- Button to trigger modal -->
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
+            Add Note
+        </button>
+        <button type="button" class="btn btn-primary" @onclick="SaveAndRefreshPage">Save Details</button>
+        <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
+    </div>
+</div>
 @if (Expense is null)
 {
     <p><em>Loading...</em></p>
@@ -23,26 +32,39 @@
 else
 {
     <div class="row">
-        <div class="col-md-4">
-            <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
-                <DataAnnotationsValidator />
-                <ValidationSummary role="alert" />
-                <input type="hidden" name="Expense.Id" value="@Expense.Id" />
-                <div class="mb-3">
-                    <label for="totalamount" class="form-label">TotalAmount:</label>
-                    <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
-                    <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
+        <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary role="alert" />
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="hidden" name="Expense.Id" value="@Expense.Id" />
+                    <div class="mb-3">
+                        <label for="totalamount" class="form-label">TotalAmount:</label>
+                        <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
+                        <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
+                    </div>
                 </div>
-                <div class="mb-3">
-                    <label for="totalhst" class="form-label">TotalHst:</label>
-                    <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
-                    <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="totalhst" class="form-label">TotalHst:</label>
+                        <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
+                        <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
+                    </div>
                 </div>
-                <button type="submit" class="btn btn-primary">Save</button>
-            </EditForm>
-        </div>
+            </div>
+            @* <button type="submit" class="btn btn-primary">Save</button> *@
+        </EditForm>
     </div>
 }
+
+
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>Approvals</h3>
+        </div>
+    </div>
+</div>
 
 <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
 <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
@@ -54,6 +76,30 @@ else
         <option value="@employee.Id">@employee.FullName</option>
     }
 </InputSelect>
+
+
+
+<QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
+    <PropertyColumn Property="approval => approval.Approver.FullName" />
+    <PropertyColumn Property="approval => approval.LastUpdated" />
+    <PropertyColumn Property="approval => approval.IsApproved" />
+
+    <TemplateColumn Context="approval">
+        <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> |
+        @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
+        <a href="@($"approvals/delete?id={approval.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>Expense Details</h3>
+        </div>
+    </div>
+</div>
+
 <!-- Button to trigger modal -->
 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
     Add Note
@@ -96,6 +142,14 @@ else
             <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
         </TemplateColumn>
     </QuickGrid>
+
+    <div class="row">
+        <div class="col-12">
+            <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+                <h3>Attachments</h3>
+            </div>
+        </div>
+    </div>
     <!-- File Upload -->
     <div class="mb-3">
         <label for="fileUpload" class="form-label">Upload Attachment:</label>
@@ -111,7 +165,8 @@ else
                 <div class="col-md-3 mb-3">
                     <div class="card">
                         <button class="btn btn-link" @onclick="() => DownloadFile(image.Id)">
-                            <img src="api/file/@image.FileName" class="card-img-top" alt="@image.FileName" />
+                            @image.FileName
+                            @* <img src="" class="card-img-top" alt="@image.FileName" /> *@
                         </button>
                         <div class="card-body">
                             <p class="card-text">@image.FileName</p>
@@ -125,7 +180,13 @@ else
     {
         <p>No images attached to this expense.</p>
     }
-
+    <div class="row">
+        <div class="col-12">
+            <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+                <h3>Notes</h3>
+            </div>
+        </div>
+    </div>
     <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
         <TemplateColumn Title="Note Text" Class="w-50">
             <div style="width: 100%;">
@@ -170,6 +231,7 @@ else
     private List<Approval> _approvals = new List<Approval>();
     private List<Image> _images = new List<Image>();
 
+    private EditForm editForm;
 
     protected override async Task OnInitializedAsync()
     {
@@ -196,7 +258,7 @@ else
 
         RefreshAttachmentsList();
 
-    _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
+        _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -221,8 +283,8 @@ else
                 throw;
             }
         }
-
-        NavigationManager.NavigateTo("/expenses");
+        // RefreshPage();
+        // NavigationManager.NavigateTo("/expenses");
     }
 
     private bool ExpenseExists(int id)
@@ -252,7 +314,7 @@ else
 
         var approval = new Approval
             {
-                Approver = _employee,
+                Approver = approver,
                 LastUpdated = DateTime.Now,
                 IsApproved = false,
                 ExpenseId = Expense.Id
@@ -338,9 +400,27 @@ else
         await JSRuntime.InvokeVoidAsync("openFileFromBase64", fileName, base64);
     }
 
-    private async Task RefreshAttachmentsList(){
+    private async Task RefreshAttachmentsList()
+    {
         _images = await context.Images
                     .Where(img => img.ExpenseId == Expense.Id)
                     .ToListAsync();
+    }
+
+    private async Task SubmitForm()
+    {
+        await UpdateExpense();
+    }
+
+    private void SaveAndRefreshPage()
+    {
+        UpdateExpense();
+        NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+    }
+
+    private void SaveAndReturnToList()
+    {
+        UpdateExpense();
+        NavigationManager.NavigateTo("/expenses");
     }
 }

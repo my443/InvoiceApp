@@ -117,8 +117,6 @@ else
         }
     </InputSelect>
 
-
-
     <QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
         <PropertyColumn Property="approval => approval.Approver.FullName" />
         <PropertyColumn Property="approval => approval.LastUpdated" />
@@ -205,7 +203,13 @@ else
                         </button>
                         <div class="card-body">
                             <p class="card-text">@image.FileName</p>
+                            <p style="text-align:end">
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAttachmentModal" @onclick='() => DeleteAttachment(image.Id)'>
+                                    Delete Attachment
+                                </button>
+                            </p>
                         </div>
+
                     </div>
                 </div>
             }
@@ -254,25 +258,44 @@ else
 
 
 
-    <!-- Delete Approver -->
-    <div class="modal " id="deleteApprovalModal" tabindex="-1" aria-labelledby="deleteApprovalModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteApprovalModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this approver?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger" @onclick="ConfirmDeleteApproval">Yes</button>
-                </div>
+<!-- Delete Approver -->
+<div class="modal " id="deleteApprovalModal" tabindex="-1" aria-labelledby="deleteApprovalModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteApprovalModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this approver?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmDeleteApproval">Yes</button>
             </div>
         </div>
     </div>
+</div>
 
+
+<!-- Delete Attachment -->
+<div class="modal " id="deleteAttachmentModal" tabindex="-1" aria-labelledby="deleteAttachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteAttachmentModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this attachment?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmDeleteAttachment">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @code {
     [SupplyParameterFromQuery]
@@ -298,6 +321,7 @@ else
     private EditForm editForm;
 
     private int selectedApprovalForDeletion;
+    private int selectedAttachmentForDeletion;
 
     protected override async Task OnInitializedAsync()
     {
@@ -511,7 +535,6 @@ else
     private void DeleteApprover(int approvalId)
     {
         selectedApprovalForDeletion = approvalId;
-        _expenseViewModel.sectionVisibility["DeleteApproverModal"] = true;
     }
 
     private async Task ConfirmDeleteApproval()
@@ -526,5 +549,26 @@ else
         // Hide the modal
         var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#deleteApprovalModal");
         await modal.InvokeVoidAsync("hide");
+    }
+
+    private void DeleteAttachment(int imageId)
+    {
+        selectedAttachmentForDeletion = imageId;
+    }
+
+    private async Task ConfirmDeleteAttachment() { 
+
+        var image = context.Images.Find(selectedAttachmentForDeletion);
+        if (image != null)
+        {
+            context.Images.Remove(image);
+            context.SaveChanges();
+        }
+
+        var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#deleteAttachmentModal");
+        await modal.InvokeVoidAsync("hide");
+
+        RefreshAttachmentsList();
+        StateHasChanged();
     }
 }

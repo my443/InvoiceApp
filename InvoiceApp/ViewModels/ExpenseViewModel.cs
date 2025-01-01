@@ -27,6 +27,7 @@ namespace InvoiceApp.ViewModels
                 { "Images", false },
                 { "Notes", false },
                 { "NoteModal", false },
+                { "DeleteApproverModal", false },
                 { "AllSections", true },
             };
 
@@ -166,8 +167,6 @@ namespace InvoiceApp.ViewModels
             {
                 sectionVisibility[sectionName] = !sectionVisibility[sectionName];
             }
-
-
         }
 
         public RenderFragment SectionToggleIcon(string sectionName)

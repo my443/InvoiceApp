@@ -60,7 +60,36 @@ else
         </EditForm>
     </div>
 }
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>
+                <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("ExpenseDetails"))
+                    Expense Details
+                </a>
+            </h3>
+        </div>
+    </div>
+</div>
 
+@if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
+{
+    <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id)">
+        <PropertyColumn Property="expensedetail => expensedetail.Department" />
+        <PropertyColumn Property="expensedetail => expensedetail.Account" />
+        <PropertyColumn Property="expensedetail => expensedetail.Amount" />
+        <PropertyColumn Property="expensedetail => expensedetail.Hst" />
+        <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" />
+
+        <TemplateColumn Context="expensedetail">
+            <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
+            @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
+            <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+<hr />
 
 <div class="row">
     <div class="col-12">
@@ -108,33 +137,36 @@ else
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
             <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
-                    @(_expenseViewModel.SectionToggleIcon("ExpenseDetails"))
-                    Expense Details
+                <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("Notes"))
+                    Notes
                 </a>
             </h3>
         </div>
     </div>
 </div>
 
-@if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
+@if (_expenseViewModel.sectionVisibility["Notes"])
 {
-    <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id)">
-        <PropertyColumn Property="expensedetail => expensedetail.Department" />
-        <PropertyColumn Property="expensedetail => expensedetail.Account" />
-        <PropertyColumn Property="expensedetail => expensedetail.Amount" />
-        <PropertyColumn Property="expensedetail => expensedetail.Hst" />
-        <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" />
-
-        <TemplateColumn Context="expensedetail">
-            <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
-            @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
-            <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
+    <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
+        <TemplateColumn Title="Note Text" Class="w-50">
+            <div style="width: 100%;">
+                @((MarkupString)context.NoteText)
+            </div>
         </TemplateColumn>
+        <PropertyColumn Property="note => note.WrittenBy.FullName" />
+        <PropertyColumn Property="note => note.WrittenBy.EmailAddress" />
+        <PropertyColumn Property="note => note.DateAdded" />
+        <PropertyColumn Property="note => note.ExpenseId" />
+
+        @* <TemplateColumn Context="note"> *@
+        @*     <a href="@($"notes/edit?id={note.Id}")">Edit</a> | *@
+        @*     <a href="@($"notes/details?id={note.Id}")">Details</a> | *@
+        @*     <a href="@($"notes/delete?id={note.Id}")">Delete</a> *@
+        @* </TemplateColumn> *@
     </QuickGrid>
 }
-<hr />
-
+    <hr />
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
@@ -184,39 +216,7 @@ else
 <hr />
 
 
-<div class="row">
-    <div class="col-12">
-        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
-                    @(_expenseViewModel.SectionToggleIcon("Notes"))
-                    Notes
-                </a>
-            </h3>
-        </div>
-    </div>
-</div>
 
-@if (_expenseViewModel.sectionVisibility["Notes"])
-{
-    <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
-        <TemplateColumn Title="Note Text" Class="w-50">
-            <div style="width: 100%;">
-                @((MarkupString)context.NoteText)
-            </div>
-        </TemplateColumn>
-        <PropertyColumn Property="note => note.WrittenBy.FullName" />
-        <PropertyColumn Property="note => note.WrittenBy.EmailAddress" />
-        <PropertyColumn Property="note => note.DateAdded" />
-        <PropertyColumn Property="note => note.ExpenseId" />
-
-        @* <TemplateColumn Context="note"> *@
-        @*     <a href="@($"notes/edit?id={note.Id}")">Edit</a> | *@
-        @*     <a href="@($"notes/details?id={note.Id}")">Details</a> | *@
-        @*     <a href="@($"notes/delete?id={note.Id}")">Delete</a> *@
-        @* </TemplateColumn> *@
-    </QuickGrid>
-}
     <a href="/expenses">Back to List</a>
 
 

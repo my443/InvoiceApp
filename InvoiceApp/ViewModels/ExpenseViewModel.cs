@@ -1,8 +1,9 @@
 ﻿using InvoiceApp.Data;
 using InvoiceApp.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using InvoiceApp.Components.Icons;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+
 
 namespace InvoiceApp.ViewModels
 {
@@ -163,6 +164,18 @@ namespace InvoiceApp.ViewModels
             {
                 sectionVisibility[sectionName] = !sectionVisibility[sectionName];
             }
+        }
+
+        public RenderFragment SectionToggleIcon(string sectionName)
+        {
+            if (sectionVisibility.ContainsKey(sectionName))
+            {
+                return sectionVisibility[sectionName] ?
+                    (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); })
+                    : (builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); });
+            }
+            //return "none";
+            return new RenderFragment(builder => { });
         }
 
     }

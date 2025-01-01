@@ -66,7 +66,9 @@ else
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
             <h3>
-                @(_expenseViewModel.sectionVisibility["AllSections"] ? (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); }) : (builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); })) Approvals
+                @(_expenseViewModel.sectionVisibility["AllSections"] ? (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); }) : (builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); })) 
+                @(_expenseViewModel.SectionToggleIcon("AllSections"))
+                Approvals
             </h3>
         </div>
     </div>
@@ -325,6 +327,11 @@ else
     private async Task AddApproval()
     {
         Employee approver = await context.Employees.FirstOrDefaultAsync(e => e.Id == selectedEmployeeId);
+
+        if (approver is null)
+        {
+            return;
+        }
 
         var approval = new Approval
             {

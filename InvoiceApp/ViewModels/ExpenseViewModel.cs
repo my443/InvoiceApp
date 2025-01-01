@@ -21,7 +21,12 @@ namespace InvoiceApp.ViewModels
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
             {
                 { "ExpenseSummary", true },
-                { "ExpenseDetails", true }
+                { "ExpenseDetails", true },
+                { "Approvals", true },
+                { "Images", true },
+                { "Notes", true },
+                { "NoteModal", false },
+                { "AllSections", true },
             };
 
         public ExpenseViewModel(ApplicationDbContext appDbContext)

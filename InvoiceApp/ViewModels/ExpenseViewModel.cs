@@ -21,11 +21,11 @@ namespace InvoiceApp.ViewModels
 
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
             {
-                { "ExpenseSummary", true },
-                { "ExpenseDetails", true },
-                { "Approvals", true },
-                { "Images", true },
-                { "Notes", true },
+                { "ExpenseSummary", false },
+                { "ExpenseDetails", false },
+                { "Approvals", false },
+                { "Images", false },
+                { "Notes", false },
                 { "NoteModal", false },
                 { "AllSections", true },
             };
@@ -150,8 +150,6 @@ namespace InvoiceApp.ViewModels
                 expense.ExpenseDetails.Add(balancingDetail);
                 _appDbContext.SaveChanges();
             }
-
-
         }
 
         /// <summary>
@@ -160,10 +158,16 @@ namespace InvoiceApp.ViewModels
         /// <param name="sectionName"></param>
         public void ToggleSection(string sectionName)
         {
+            if (sectionName == "AllSections")
+            {
+                ToggleAllSections();
+            }
             if (sectionVisibility.ContainsKey(sectionName))
             {
                 sectionVisibility[sectionName] = !sectionVisibility[sectionName];
             }
+
+
         }
 
         public RenderFragment SectionToggleIcon(string sectionName)
@@ -171,12 +175,29 @@ namespace InvoiceApp.ViewModels
             if (sectionVisibility.ContainsKey(sectionName))
             {
                 return sectionVisibility[sectionName] ?
-                    (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); })
-                    : (builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); });
+                    (RenderFragment)(builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); })
+                    : (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); });
             }
             //return "none";
             return new RenderFragment(builder => { });
         }
 
+        private void ToggleAllSections()
+        {
+            if (!sectionVisibility["AllSections"])
+            {
+                foreach (var section in sectionVisibility.Keys.Where(key => key != "AllSections").ToList())
+                {
+                    sectionVisibility[section] = false;
+                }
+            }
+            else {
+                foreach (var section in sectionVisibility.Keys.Where(key => key != "AllSections").ToList())
+                {
+                    sectionVisibility[section] = true;
+                }
+            }
+        }
     }
+
 }

@@ -25,7 +25,7 @@
         <button type="button" class="btn btn-primary" @onclick="SaveAndRefreshPage">Save Details</button>
         <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
 
-        <button @onclick='() => _expenseViewModel.ToggleSection("AllSections")' class="btn btn-primary">@(_expenseViewModel.sectionVisibility["AllSections"] ? "Hide All Sections" : "Show All Sections")</button>
+        <button @onclick='() => _expenseViewModel.ToggleSection("AllSections")' class="btn btn-primary">@(_expenseViewModel.sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
         <p>@_expenseViewModel.sectionVisibility["AllSections"]</p>
     </div>
 </div>
@@ -66,78 +66,59 @@ else
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
             <h3>
-                @(_expenseViewModel.sectionVisibility["AllSections"] ? (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); }) : (builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); })) 
-                @(_expenseViewModel.SectionToggleIcon("AllSections"))
-                Approvals
+                <a @onclick='() => _expenseViewModel.ToggleSection("Approvals")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("Approvals"))
+                    Approvals
+                </a>
             </h3>
         </div>
     </div>
 </div>
 
-<button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
-<InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
+@if (_expenseViewModel.sectionVisibility["Approvals"])
+{
+    <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
+    <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
 
-<InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
-    <option value="">-- Select an Employee --</option>
-    @foreach (var employee in filteredEmployees)
-    {
-        <option value="@employee.Id">@employee.FullName</option>
-    }
-</InputSelect>
+    <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
+        <option value="">-- Select an Employee --</option>
+        @foreach (var employee in filteredEmployees)
+        {
+            <option value="@employee.Id">@employee.FullName</option>
+        }
+    </InputSelect>
 
 
 
-<QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
-    <PropertyColumn Property="approval => approval.Approver.FullName" />
-    <PropertyColumn Property="approval => approval.LastUpdated" />
-    <PropertyColumn Property="approval => approval.IsApproved" />
+    <QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
+        <PropertyColumn Property="approval => approval.Approver.FullName" />
+        <PropertyColumn Property="approval => approval.LastUpdated" />
+        <PropertyColumn Property="approval => approval.IsApproved" />
 
-    <TemplateColumn Context="approval">
-        <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> |
-        @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
-        <a href="@($"approvals/delete?id={approval.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
-
+        <TemplateColumn Context="approval">
+            <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> |
+            @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
+            <a href="@($"approvals/delete?id={approval.Id}")">Delete</a>
+        </TemplateColumn>
+    </QuickGrid>
+}
+<hr />
 
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <h3>Expense Details</h3>
+            <h3>
+                <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("ExpenseDetails"))
+                    Expense Details
+                </a>
+            </h3>
         </div>
     </div>
 </div>
 
-<!-- Button to trigger modal -->
-@* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal"> *@
-@*     Add Note *@
-@* </button> *@
-
-
-<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <EditForm Model="newNote" OnValidSubmit="AddNote">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary class="text-danger" role="alert" />
-                    <div class="mb-3">
-                        <label for="noteText" class="form-label">Note:</label>
-                        <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" rows="7" />
-                        <ValidationMessage For="() => newNote.NoteText" class="text-danger" />
-                    </div>
-                    <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
-                </EditForm>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div>
+@if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
+{
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id)">
         <PropertyColumn Property="expensedetail => expensedetail.Department" />
         <PropertyColumn Property="expensedetail => expensedetail.Account" />
@@ -151,14 +132,24 @@ else
             <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
         </TemplateColumn>
     </QuickGrid>
+}
+<hr />
 
-    <div class="row">
-        <div class="col-12">
-            <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-                <h3>Attachments</h3>
-            </div>
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>
+                <a @onclick='() => _expenseViewModel.ToggleSection("Images")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("Images"))
+                    Attachments
+                </a>
+            </h3>
         </div>
     </div>
+</div>
+
+@if (_expenseViewModel.sectionVisibility["Images"])
+{
     <!-- File Upload -->
     <div class="mb-3">
         <label for="fileUpload" class="form-label">Upload Attachment:</label>
@@ -189,13 +180,25 @@ else
     {
         <p>No images attached to this expense.</p>
     }
-    <div class="row">
-        <div class="col-12">
-            <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-                <h3>Notes</h3>
-            </div>
+}
+<hr />
+
+
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>
+                <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
+                    @(_expenseViewModel.SectionToggleIcon("Notes"))
+                    Notes
+                </a>
+            </h3>
         </div>
     </div>
+</div>
+
+@if (_expenseViewModel.sectionVisibility["Notes"])
+{
     <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
         <TemplateColumn Title="Note Text" Class="w-50">
             <div style="width: 100%;">
@@ -213,11 +216,38 @@ else
         @*     <a href="@($"notes/delete?id={note.Id}")">Delete</a> *@
         @* </TemplateColumn> *@
     </QuickGrid>
-
+}
     <a href="/expenses">Back to List</a>
+
+
+<!-- Button to trigger modal -->
+@* <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal"> *@
+@*     Add Note *@
+@* </button> *@
+
+
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <EditForm Model="newNote" OnValidSubmit="AddNote">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
+                    <div class="mb-3">
+                        <label for="noteText" class="form-label">Note:</label>
+                        <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" rows="7" />
+                        <ValidationMessage For="() => newNote.NoteText" class="text-danger" />
+                    </div>
+                    <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
+                </EditForm>
+            </div>
+        </div>
+    </div>
 </div>
-
-
 
 @code {
     [SupplyParameterFromQuery]

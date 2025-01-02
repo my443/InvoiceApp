@@ -81,12 +81,12 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
+            <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
+                <h3>
                     @(_expenseViewModel.SectionToggleIcon("ExpenseDetails"))
                     Expense Details
-                </a>
-            </h3>
+                </h3>
+            </a>
         </div>
     </div>
 </div>
@@ -113,10 +113,10 @@ else
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
             <a @onclick='() => _expenseViewModel.ToggleSection("Approvals")' style="cursor: pointer;">
-            <h3>
+                <h3>
                     @(_expenseViewModel.SectionToggleIcon("Approvals"))
                     Approvals
-            </h3>
+                </h3>
             </a>
         </div>
     </div>
@@ -155,12 +155,12 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
+            <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
+                <h3>
                     @(_expenseViewModel.SectionToggleIcon("Notes"))
                     Notes
-                </a>
-            </h3>
+                </h3>
+            </a>
         </div>
     </div>
 </div>
@@ -189,12 +189,12 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("Images")' style="cursor: pointer;">
+            <a @onclick='() => _expenseViewModel.ToggleSection("Images")' style="cursor: pointer;">
+                <h3>
                     @(_expenseViewModel.SectionToggleIcon("Images"))
                     Attachments
-                </a>
-            </h3>
+                </h3>
+            </a>
         </div>
     </div>
 </div>
@@ -578,11 +578,16 @@ else
     {
 
         var image = context.Images.Find(selectedAttachmentForDeletion);
+        string fileName = $"{image.Id}-{image.FileName}";
+
         if (image != null)
         {
             context.Images.Remove(image);
             context.SaveChanges();
         }
+
+        // Delete the file from the directory.
+        File.Delete(Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads", fileName));
 
         var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#deleteAttachmentModal");
         await modal.InvokeVoidAsync("hide");

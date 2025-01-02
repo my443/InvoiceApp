@@ -21,14 +21,14 @@ namespace InvoiceApp.ViewModels
 
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
             {
-                { "ExpenseSummary", false },
-                { "ExpenseDetails", false },
-                { "Approvals", false },
-                { "Images", false },
-                { "Notes", false },
+                { "ExpenseSummary", true },
+                { "ExpenseDetails", true },
+                { "Approvals", true },
+                { "Images", true },
+                { "Notes", true },
                 { "NoteModal", false },
                 { "DeleteApproverModal", false },
-                { "AllSections", true },
+                { "AllSections", false },
             };
 
         public ExpenseViewModel(ApplicationDbContext appDbContext)
@@ -76,23 +76,24 @@ namespace InvoiceApp.ViewModels
             return _appDbContext.Expenses.FirstOrDefault(e => e.Id == id);
         }
 
-        // Update an existing expense
-        public void UpdateExpense(int id, decimal totalAmount, decimal totalHst, string vendor, Employee submittedBy, ExpenseStatus expenseStatus)
-        {
-            Expense expenseToUpdate = _appDbContext.Expenses.FirstOrDefault(e => e.Id == id);
-            if (expenseToUpdate != null)
-            {
-                expenseToUpdate.TotalAmount = totalAmount;
-                expenseToUpdate.TotalHst = totalHst;
-                expenseToUpdate.Vendor = vendor;
-                expenseToUpdate.SubmittedBy = submittedBy;
-                expenseToUpdate.ExpenseStatus = expenseStatus;
+        //// Update an existing expense
+        //public void UpdateExpense(int id, decimal totalAmount, decimal totalHst, string vendor, Employee submittedBy, ExpenseStatus expenseStatus)
+        //{
+        //    Expense expenseToUpdate = _appDbContext.Expenses.FirstOrDefault(e => e.Id == id);
 
-                EnsureExpenseDetailsSum(expenseToUpdate);
+        //    if (expenseToUpdate != null)
+        //    {
+        //        expenseToUpdate.TotalAmount = totalAmount;
+        //        expenseToUpdate.TotalHst = totalHst;
+        //        expenseToUpdate.Vendor = vendor;
+        //        expenseToUpdate.SubmittedBy = submittedBy;
+        //        expenseToUpdate.ExpenseStatus = expenseStatus;
 
-                _appDbContext.SaveChanges();
-            }
-        }
+        //        EnsureExpenseDetailsSum(expenseToUpdate);
+
+        //        _appDbContext.SaveChanges();
+        //    }
+        //}
 
         // Delete an expense by ID
         public void DeleteExpense(int id)
@@ -123,9 +124,8 @@ namespace InvoiceApp.ViewModels
         // Ensure that the sum of all ExpenseDetails is equal to the TotalAmount and TotalHst
         public void EnsureExpenseDetailsSum(Expense expense)
         {
-            decimal currentDetailsAmountTotal = _appDbContext.ExpenseDetails.Sum(ed => ed.Amount);
-            decimal currentDetailsHstTotal = _appDbContext.ExpenseDetails.Sum(ed => ed.Hst);
-
+            decimal currentDetailsAmountTotal = _appDbContext.ExpenseDetails.Where(ed => ed.ExpenseId == expense.Id).Sum(ed => ed.Amount);
+            decimal currentDetailsHstTotal = _appDbContext.ExpenseDetails.Where(ed => ed.ExpenseId == expense.Id).Sum(ed => ed.Hst);
 
             Console.WriteLine($"Current Details Amount Total: {currentDetailsAmountTotal}");
             Console.WriteLine($"Current Details HST Total: {currentDetailsHstTotal}");

@@ -29,6 +29,17 @@
         <p>@_expenseViewModel.sectionVisibility["AllSections"]</p>
     </div>
 </div>
+
+<div class="row">
+    <div class="col-12">
+        <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <h3>
+                Expense Summary
+            </h3>
+        </div>
+    </div>
+</div>
+
 @if (Expense is null)
 {
     <p><em>Loading...</em></p>
@@ -40,17 +51,24 @@ else
             <DataAnnotationsValidator />
             <ValidationSummary role="alert" />
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="totalhst" class="form-label">Vendor Name</label>
+                        <InputText id="vendor" @bind-Value="Expense.Vendor" class="form-control" />
+                        <ValidationMessage For="() => Expense.Vendor" class="text-danger" />
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <input type="hidden" name="Expense.Id" value="@Expense.Id" />
                     <div class="mb-3">
-                        <label for="totalamount" class="form-label">TotalAmount:</label>
+                        <label for="totalamount" class="form-label">Total Amount</label>
                         <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
                         <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
                     </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="mb-3">
-                        <label for="totalhst" class="form-label">TotalHst:</label>
+                        <label for="totalhst" class="form-label">Total Hst</label>
                         <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
                         <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
                     </div>
@@ -75,9 +93,9 @@ else
 
 @if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
 {
-    <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id)">
-        <PropertyColumn Property="expensedetail => expensedetail.Department" />
-        <PropertyColumn Property="expensedetail => expensedetail.Account" />
+    <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
+        <PropertyColumn Property="expensedetail => expensedetail.Department.Name" />
+        <PropertyColumn Property="expensedetail => expensedetail.Account.Name" />
         <PropertyColumn Property="expensedetail => expensedetail.Amount" />
         <PropertyColumn Property="expensedetail => expensedetail.Hst" />
         <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" />
@@ -94,12 +112,12 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
+            <a @onclick='() => _expenseViewModel.ToggleSection("Approvals")' style="cursor: pointer;">
             <h3>
-                <a @onclick='() => _expenseViewModel.ToggleSection("Approvals")' style="cursor: pointer;">
                     @(_expenseViewModel.SectionToggleIcon("Approvals"))
                     Approvals
-                </a>
             </h3>
+            </a>
         </div>
     </div>
 </div>
@@ -556,7 +574,8 @@ else
         selectedAttachmentForDeletion = imageId;
     }
 
-    private async Task ConfirmDeleteAttachment() { 
+    private async Task ConfirmDeleteAttachment()
+    {
 
         var image = context.Images.Find(selectedAttachmentForDeletion);
         if (image != null)

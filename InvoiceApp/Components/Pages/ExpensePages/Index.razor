@@ -15,6 +15,7 @@
 </p>
 
 <QuickGrid Class="table" Items="context.Expenses">
+    <PropertyColumn Property="expense => expense.Vendor" />
     <PropertyColumn Property="expense => expense.TotalAmount" />
     <PropertyColumn Property="expense => expense.TotalHst" />
 

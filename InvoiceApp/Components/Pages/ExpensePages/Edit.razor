@@ -633,6 +633,7 @@ else
     {       
         context.Update(expensedetail);
         await context.SaveChangesAsync();
+        _expenseViewModel.EnsureExpenseDetailsSum(Expense);
         // ToDo - Update the correct amount for the whole list of transactions.
         StateHasChanged();
     }

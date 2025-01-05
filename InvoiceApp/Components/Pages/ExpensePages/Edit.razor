@@ -94,18 +94,29 @@ else
 @if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
 {
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
+        <TemplateColumn Title="Department" Context="expensedetail">
+            <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+                @foreach (var department in _departments)
+                {
+                    <option value="@department.Id">@department.Name</option>
+                }
+            </InputSelect>
+        </TemplateColumn>
         <PropertyColumn Property="expensedetail => expensedetail.Department.Name" />
         <PropertyColumn Property="expensedetail => expensedetail.Account.Name" />
         <PropertyColumn Property="expensedetail => expensedetail.Amount" />
         <PropertyColumn Property="expensedetail => expensedetail.Hst" />
-        <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" />
+        @* <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" /> *@
 
         <TemplateColumn Context="expensedetail">
+            <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
             <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
             @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
             <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
         </TemplateColumn>
     </QuickGrid>
+
+    
 }
 <hr />
 
@@ -341,6 +352,8 @@ else
     private int selectedApprovalForDeletion;
     private int selectedAttachmentForDeletion;
 
+    private List<Department> _departments;
+
     protected override async Task OnInitializedAsync()
     {
         context = DbFactory.CreateDbContext();
@@ -367,6 +380,7 @@ else
         RefreshAttachmentsList();
 
         _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
+        _departments = await context.Departments.ToListAsync();
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -594,5 +608,11 @@ else
 
         RefreshAttachmentsList();
         StateHasChanged();
+    }
+
+    private async Task OnDepartmentChanged(ExpenseDetail expensedetail)
+    {       
+        context.Update(expensedetail);
+        await context.SaveChangesAsync();
     }
 }

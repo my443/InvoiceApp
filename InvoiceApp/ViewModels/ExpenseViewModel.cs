@@ -31,6 +31,7 @@ namespace InvoiceApp.ViewModels
                 { "AllSections", false },
             };
 
+        private bool IsEditing { get; set; } = false;
         public ExpenseViewModel(ApplicationDbContext appDbContext)
         {
             UserCanApprove = false;

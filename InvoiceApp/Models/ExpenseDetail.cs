@@ -21,5 +21,7 @@ namespace InvoiceApp.Models
 
         // For FK relationship
         public int ExpenseId { get; set; }
+
+        public int DepartmentId { get; set; }
     }
 }

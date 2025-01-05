@@ -102,8 +102,25 @@ else
                 }
             </InputSelect>
         </TemplateColumn>
-        <PropertyColumn Property="expensedetail => expensedetail.Department.Name" />
-        <PropertyColumn Property="expensedetail => expensedetail.Account.Name" />
+        <TemplateColumn Title="Department" Context="expensedetail">
+            <InputSelect @bind-Value="expensedetail.AccountId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+                @foreach (var account in _glaccounts)
+                {
+                    <option value="@account.Id">@account.Name</option>
+                }
+            </InputSelect>
+        </TemplateColumn>
+        @* <PropertyColumn Property="expensedetail => expensedetail.Department.Name" /> *@
+        @* <PropertyColumn Property="expensedetail => expensedetail.Account.Name" /> *@
+        <TemplateColumn Title="HST" Context="expensedetail">
+            <InputNumber @bind-Value="expensedetail.Hst" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+            </InputNumber>
+        </TemplateColumn>
+        <TemplateColumn Title="Amount" Context="expensedetail">
+            <InputNumber @bind-Value="expensedetail.Amount" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+            </InputNumber>
+        </TemplateColumn>
+
         <PropertyColumn Property="expensedetail => expensedetail.Amount" />
         <PropertyColumn Property="expensedetail => expensedetail.Hst" />
         @* <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" /> *@
@@ -116,7 +133,7 @@ else
         </TemplateColumn>
     </QuickGrid>
 
-    
+
 }
 <hr />
 
@@ -353,6 +370,7 @@ else
     private int selectedAttachmentForDeletion;
 
     private List<Department> _departments;
+    private List<GLAccount> _glaccounts;    
 
     protected override async Task OnInitializedAsync()
     {
@@ -381,6 +399,7 @@ else
 
         _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
         _departments = await context.Departments.ToListAsync();
+        _glaccounts = await context.GLAccounts.ToListAsync();
     }
 
     // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -614,5 +633,7 @@ else
     {       
         context.Update(expensedetail);
         await context.SaveChangesAsync();
+        // ToDo - Update the correct amount for the whole list of transactions.
+        StateHasChanged();
     }
 }

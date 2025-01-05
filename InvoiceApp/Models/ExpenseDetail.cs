@@ -23,5 +23,6 @@ namespace InvoiceApp.Models
         public int ExpenseId { get; set; }
 
         public int DepartmentId { get; set; }
+        public int AccountId { get; set; }
     }
 }

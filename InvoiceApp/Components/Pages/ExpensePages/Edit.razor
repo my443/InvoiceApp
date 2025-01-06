@@ -93,9 +93,10 @@ else
 
 @if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
 {
+    <button class="btn btn-success" @onclick="AddExpenseDetail">Add Expense Detail</button>
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
         <TemplateColumn Title="Department" Context="expensedetail">
-            <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+            <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)" >
                 @foreach (var department in _departments)
                 {
                     <option value="@department.Id">@department.Name</option>
@@ -127,9 +128,10 @@ else
 
         <TemplateColumn Context="expensedetail">
             <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
-            <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> |
+            @* <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> | *@
             @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
-            <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a>
+            <button class="btn btn-danger" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
+            @* <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a> *@
         </TemplateColumn>
     </QuickGrid>
 
@@ -630,11 +632,57 @@ else
     }
 
     private async Task OnDepartmentChanged(ExpenseDetail expensedetail)
-    {       
+    {
         context.Update(expensedetail);
         await context.SaveChangesAsync();
         _expenseViewModel.EnsureExpenseDetailsSum(Expense);
         // ToDo - Update the correct amount for the whole list of transactions.
+        StateHasChanged();
+    }
+
+    private async Task DeleteDetailRow(ExpenseDetail expensedetail)
+    {
+        var previousExpenseDetail = context.ExpenseDetails
+            .Where(ed => ed.ExpenseId == expensedetail.ExpenseId && ed.Id < expensedetail.Id)
+            .OrderByDescending(ed => ed.Id)
+            .FirstOrDefault();
+
+        if (previousExpenseDetail != null)
+        {
+            previousExpenseDetail.Amount += expensedetail.Amount;
+            previousExpenseDetail.Hst += expensedetail.Hst;
+        }
+
+        context.ExpenseDetails.Remove(expensedetail);
+
+        await context.SaveChangesAsync();
+        _expenseViewModel.EnsureExpenseDetailsSum(Expense);
+        StateHasChanged();
+    }
+
+    /// <summary>
+    /// Look at the last expense, and the divide it in 1/2.
+    /// Then let the app update the next row to balance out the amount that it needs to be.
+    /// (EnsureExpenseDetailsSum)
+    /// </summary>
+    /// <returns></returns>
+    private async Task AddExpenseDetail()
+    {
+        
+        var lastExpenseDetail = context.ExpenseDetails
+            .Where(ed => ed.ExpenseId == Expense.Id)
+            .OrderByDescending(ed => ed.Id)
+            .FirstOrDefault();
+
+        if (lastExpenseDetail != null)
+        {
+            lastExpenseDetail.Amount =  Math.Round(lastExpenseDetail.Amount / 2, 2);
+            lastExpenseDetail.Hst = Math.Round(lastExpenseDetail.Hst / 2, 2);
+        }
+
+        await context.SaveChangesAsync();
+
+        _expenseViewModel.EnsureExpenseDetailsSum(Expense);
         StateHasChanged();
     }
 }

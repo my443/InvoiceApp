@@ -31,7 +31,7 @@ namespace InvoiceApp.ViewModels
                 { "AllSections", false },
             };
 
-        private bool IsEditing { get; set; } = false;
+        public bool IsEditing { get; set; } = true;
         public ExpenseViewModel(ApplicationDbContext appDbContext)
         {
             UserCanApprove = false;
@@ -197,6 +197,11 @@ namespace InvoiceApp.ViewModels
                     sectionVisibility[section] = true;
                 }
             }
+        }
+
+        public void ToggleIsEditing()
+        {
+            IsEditing = !IsEditing;
         }
     }
 

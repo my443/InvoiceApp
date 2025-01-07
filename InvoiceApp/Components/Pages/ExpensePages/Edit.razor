@@ -19,14 +19,15 @@
 <div class="row">
     <div class="text-end">
         <!-- Button to trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">
-            <AddIcon /> Add Note
-        </button>
-        <button type="button" class="btn btn-primary" @onclick="SaveAndRefreshPage">Save Details</button>
-        <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
-
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>
+        @if(_expenseViewModel.IsEditing)
+        {
+            <button type="button" class="btn btn-primary" @onclick="SaveAndRefreshPage">Save Details</button>
+            <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
+        }
         <button @onclick='() => _expenseViewModel.ToggleSection("AllSections")' class="btn btn-primary">@(_expenseViewModel.sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
-        <p>@_expenseViewModel.sectionVisibility["AllSections"]</p>
+        <button type="button" class="btn btn-primary" @onclick="()=> _expenseViewModel.ToggleIsEditing()">Lock Expense</button>
+        <p>@(_expenseViewModel.IsEditing ? "Editing" : "Locked")</p>
     </div>
 </div>
 
@@ -93,10 +94,13 @@ else
 
 @if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
 {
-    <button class="btn btn-success" @onclick="AddExpenseDetail">Add Expense Detail</button>
+    @if (_expenseViewModel.IsEditing)
+    {
+        <button class="btn btn-success" @onclick="AddExpenseDetail">Add Expense Detail</button>
+    }
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
         <TemplateColumn Title="Department" Context="expensedetail">
-            <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)" >
+            <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
                 @foreach (var department in _departments)
                 {
                     <option value="@department.Id">@department.Name</option>
@@ -126,13 +130,16 @@ else
         <PropertyColumn Property="expensedetail => expensedetail.Hst" />
         @* <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" /> *@
 
-        <TemplateColumn Context="expensedetail">
-            <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
-            @* <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> | *@
-            @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
-            <button class="btn btn-danger" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
-            @* <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a> *@
-        </TemplateColumn>
+        @if (_expenseViewModel.IsEditing)
+        {
+            <TemplateColumn Context="expensedetail">
+                <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
+                @* <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> | *@
+                @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
+                <button class="btn btn-danger" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
+                @* <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a> *@
+            </TemplateColumn>
+        }
     </QuickGrid>
 
 
@@ -154,30 +161,35 @@ else
 
 @if (_expenseViewModel.sectionVisibility["Approvals"])
 {
-    <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
-    <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
+    @if (_expenseViewModel.IsEditing)
+    {
+        <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
 
-    <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
-        <option value="">-- Select an Employee --</option>
-        @foreach (var employee in filteredEmployees)
-        {
-            <option value="@employee.Id">@employee.FullName</option>
-        }
-    </InputSelect>
+        <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
 
+        <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
+            <option value="">-- Select an Employee --</option>
+            @foreach (var employee in filteredEmployees)
+            {
+                <option value="@employee.Id">@employee.FullName</option>
+            }
+        </InputSelect>
+    }
     <QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
         <PropertyColumn Property="approval => approval.Approver.FullName" />
         <PropertyColumn Property="approval => approval.LastUpdated" />
         <PropertyColumn Property="approval => approval.IsApproved" />
-
-        <TemplateColumn Context="approval">
-            @* <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> | *@
-            @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
-            @* <a href="@($"approvals/delete?id={approval.Id}")">Delete</a> *@
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteApprovalModal" @onclick='() => DeleteApprover(approval.Id)'>
-                Delete Approver
-            </button>
-        </TemplateColumn>
+        @if (_expenseViewModel.IsEditing)
+        {
+            <TemplateColumn Context="approval">
+                @* <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> | *@
+                @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
+                @* <a href="@($"approvals/delete?id={approval.Id}")">Delete</a> *@
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteApprovalModal" @onclick='() => DeleteApprover(approval.Id)'>
+                    Delete Approver
+                </button>
+            </TemplateColumn>
+        }
     </QuickGrid>
 }
 <hr />
@@ -231,12 +243,14 @@ else
 
 @if (_expenseViewModel.sectionVisibility["Images"])
 {
-    <!-- File Upload -->
-    <div class="mb-3">
-        <label for="fileUpload" class="form-label">Upload Attachment:</label>
-        <InputFile id="fileUpload" OnChange="HandleFileSelected" />
-    </div>
-
+    @if (_expenseViewModel.IsEditing)
+    {
+        <!-- File Upload -->
+        <div class="mb-3">
+            <label for="fileUpload" class="form-label">Upload Attachment:</label>
+            <InputFile id="fileUpload" OnChange="HandleFileSelected" />
+        </div>
+    }
     @if (_images.Any())
     {
         <h3>Attached Images</h3>
@@ -372,7 +386,7 @@ else
     private int selectedAttachmentForDeletion;
 
     private List<Department> _departments;
-    private List<GLAccount> _glaccounts;    
+    private List<GLAccount> _glaccounts;
 
     protected override async Task OnInitializedAsync()
     {
@@ -668,7 +682,7 @@ else
     /// <returns></returns>
     private async Task AddExpenseDetail()
     {
-        
+
         var lastExpenseDetail = context.ExpenseDetails
             .Where(ed => ed.ExpenseId == Expense.Id)
             .OrderByDescending(ed => ed.Id)
@@ -676,7 +690,7 @@ else
 
         if (lastExpenseDetail != null)
         {
-            lastExpenseDetail.Amount =  Math.Round(lastExpenseDetail.Amount / 2, 2);
+            lastExpenseDetail.Amount = Math.Round(lastExpenseDetail.Amount / 2, 2);
             lastExpenseDetail.Hst = Math.Round(lastExpenseDetail.Hst / 2, 2);
         }
 

@@ -23,5 +23,7 @@ namespace InvoiceApp.Models
         public List<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>();
         public List<Image> Images { get; set; } = new List<Image>();
         public ExpenseStatus ExpenseStatus { get; set; }
+
+        public bool IsEditing { get; set; } = true;
     }
 }

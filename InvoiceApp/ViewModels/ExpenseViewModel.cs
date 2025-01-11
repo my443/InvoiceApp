@@ -13,6 +13,8 @@ namespace InvoiceApp.ViewModels
         private bool UserCanApprove { get; set; }
         private bool UserCanProcess { get; set; }
 
+        public bool Approved { get; set; } = false;
+
         [Precision(18, 2)]
         public double TotalAmount { get; set; }
         [Precision(18, 2)]
@@ -31,7 +33,7 @@ namespace InvoiceApp.ViewModels
                 { "AllSections", false },
             };
 
-        public bool IsEditing { get; set; } = true;
+        //public bool IsEditing { get; set; } = true;
         public ExpenseViewModel(ApplicationDbContext appDbContext)
         {
             UserCanApprove = false;
@@ -198,11 +200,11 @@ namespace InvoiceApp.ViewModels
                 }
             }
         }
+        //public void ToggleIsEditing()
+        //{
+        //    IsEditing = !IsEditing;
+        //}
 
-        public void ToggleIsEditing()
-        {
-            IsEditing = !IsEditing;
-        }
     }
 
 }

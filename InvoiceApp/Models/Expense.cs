@@ -24,6 +24,5 @@ namespace InvoiceApp.Models
         public List<Image> Images { get; set; } = new List<Image>();
         public ExpenseStatus ExpenseStatus { get; set; }
 
-        public bool IsEditing { get; set; } = true;
     }
 }

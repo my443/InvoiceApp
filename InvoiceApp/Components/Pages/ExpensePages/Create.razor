@@ -72,7 +72,7 @@
             Expense.SubmittedBy = _employee;
         }
 
-        ExpenseStatus expenseStatus = await context.ExpenseStatus.FirstOrDefaultAsync(ex => ex.Id == 2);
+        ExpenseStatus expenseStatus = await context.ExpenseStatus.FirstOrDefaultAsync(ex => ex.Id == 1); // 1 = "Created"
         Expense.ExpenseStatus = expenseStatus;
 
     }

@@ -53,37 +53,64 @@
 }
 else
 {
-    <div class="row">
-        <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
-            <DataAnnotationsValidator />
-            <ValidationSummary role="alert" />
-            <div class="row">
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="totalhst" class="form-label">Vendor Name</label>
-                        <InputText id="vendor" @bind-Value="Expense.Vendor" class="form-control" />
-                        <ValidationMessage For="() => Expense.Vendor" class="text-danger" />
+    @if (IsEditing)
+    {
+        <div class="row">
+            <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert" />
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="totalhst" class="form-label">Vendor Name</label>
+                            <InputText id="vendor" @bind-Value="Expense.Vendor" class="form-control" />
+                            <ValidationMessage For="() => Expense.Vendor" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="mb-3">
+                            <label for="totalhst" class="form-label">Total Hst</label>
+                            <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
+                            <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="hidden" name="Expense.Id" value="@Expense.Id" />
+                        <div class="mb-3">
+                            <label for="totalamount" class="form-label">Total Amount</label>
+                            <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
+                            <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="mb-3">
-                        <label for="totalhst" class="form-label">Total Hst</label>
-                        <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
-                        <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <input type="hidden" name="Expense.Id" value="@Expense.Id" />
-                    <div class="mb-3">
-                        <label for="totalamount" class="form-label">Total Amount</label>
-                        <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
-                        <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
-                    </div>
+                @* <button type="submit" class="btn btn-primary">Save</button> *@
+            </EditForm>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <b>Vendor</b><br />
+                    @Expense.Vendor
                 </div>
             </div>
-            @* <button type="submit" class="btn btn-primary">Save</button> *@
-        </EditForm>
-    </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <b>Total HST</b><br />
+                    @Expense.TotalHst
+                </div>
+            </div>
+            <div class="col-md-4">
+                <input type="hidden" name="Expense.Id" value="@Expense.Id" />
+                <div class="mb-3">
+                    <b>Total Amount</b><br />
+                    @Expense.TotalAmount
+                </div>
+            </div>
+        </div>
+        }
 }
 <div class="row">
     <div class="col-12">
@@ -407,7 +434,7 @@ else
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>No approvers found. <br />Please add approvers before submitting the expense.</p>               
+                    <p>No approvers found. <br />Please add approvers before submitting the expense.</p>
                 </div>
             }
             else

@@ -67,9 +67,14 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             RefreshAttachmentsList();
 
-            _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
+            await RefreshApprovalList();
             _departments = await context.Departments.ToListAsync();
             _glaccounts = await context.GLAccounts.ToListAsync();
+        }
+
+        private async Task RefreshApprovalList()
+        {
+            _approvals = await context.Approvals.Where(approval => approval.ExpenseId == Expense.Id).ToListAsync();
         }
 
         private void SetEditingMode()
@@ -163,6 +168,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             context.Approvals.Add(approval);
             await context.SaveChangesAsync();
+            RefreshApprovalList();
         }
 
         private void FilterEmployees(ChangeEventArgs e)
@@ -376,8 +382,29 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             }
         }
 
-        public void ToggleIsEditing()
+        private async Task SubmitExpense()
         {
+            bool result = ToggleIsEditing();
+
+            if (!_approvals.Any())
+            {
+                //await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#noApproversModal').classList.add('show')");
+                //await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#noApproversModal').style.display = 'block'");
+                var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#noApproversModal");
+                await modal.InvokeVoidAsync("hide");
+            }
+        }
+
+        public bool ToggleIsEditing()
+        {
+            RefreshApprovalList();
+ 
+
+            if (!_approvals.Any())
+            {
+                return false;
+            }
+
             IsEditing = !IsEditing;
             
             
@@ -387,6 +414,10 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             }
             context.SaveChanges();
+
+            return true;
         }
+
+
     }
 }

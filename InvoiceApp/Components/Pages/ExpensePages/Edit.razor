@@ -28,11 +28,9 @@
             {
                 <button type="button" class="btn btn-primary" @onclick="SaveAndRefreshPage">Save Details</button>
                 <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
-                <button type="button" class="btn btn-primary" @onclick="()=> ToggleIsEditing()">Lock Expense</button>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#noApproversModal" @onclick="()=> SubmitExpense()">Submit Expense</button>
             }
             <button @onclick='() => _expenseViewModel.ToggleSection("AllSections")' class="btn btn-primary">@(_expenseViewModel.sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
-            
-
 
             <p>@(IsEditing ? "Editing" : "Locked")</p>
         </div>
@@ -398,4 +396,34 @@ else
     </div>
 </div>
 
+<!--Inform that there ar eno approvers-->
+<div class="modal fade" id="noApproversModal" tabindex="-1" aria-labelledby="noApproversModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            @if (!_approvals.Any())
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noApproversModalLabel">No Approvers</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>No approvers found. <br />Please add approvers before submitting the expense.</p>               
+                </div>
+            }
+            else
+            {
+                <div class="modal-header">
+                    <h5 class="modal-title" id="noApproversModalLabel">Expense Submitted</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Expense is approved for the next step.<br />Expense is locked for editing and approvers have been notified.</p>
+                </div>
+            }
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 

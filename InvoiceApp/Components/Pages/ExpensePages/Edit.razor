@@ -99,6 +99,8 @@ else
         <button class="btn btn-success" @onclick="AddExpenseDetail">Add Expense Detail</button>
     }
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
+        @if (_expenseViewModel.IsEditing)
+        {
         <TemplateColumn Title="Department" Context="expensedetail">
             <InputSelect @bind-Value="expensedetail.DepartmentId" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
                 @foreach (var department in _departments)
@@ -126,12 +128,10 @@ else
             </InputNumber>
         </TemplateColumn>
 
-        <PropertyColumn Property="expensedetail => expensedetail.Amount" />
-        <PropertyColumn Property="expensedetail => expensedetail.Hst" />
+
         @* <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" /> *@
 
-        @if (_expenseViewModel.IsEditing)
-        {
+
             <TemplateColumn Context="expensedetail">
                 <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
                 @* <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> | *@
@@ -139,6 +139,12 @@ else
                 <button class="btn btn-danger" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
                 @* <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a> *@
             </TemplateColumn>
+        }
+        else{
+            <PropertyColumn Property="expensedetail => expensedetail.Department.Name" Title="Department" />
+            <PropertyColumn Property="expensedetail => expensedetail.Account.Name" Title="Account" />
+            <PropertyColumn Property="expensedetail => expensedetail.Amount" />
+            <PropertyColumn Property="expensedetail => expensedetail.Hst" />
         }
     </QuickGrid>
 

@@ -19,6 +19,7 @@
 <div class="row">
     <div class="col-4">
         <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
+        @_approvals.All(a => a.IsApproved);
     </div>
     <div class="col-8">
         <div class="text-end">
@@ -110,7 +111,7 @@ else
                 </div>
             </div>
         </div>
-        }
+    }
 }
 <div class="row">
     <div class="col-12">
@@ -215,15 +216,12 @@ else
             }
         </InputSelect>
     }
-    @if (!IsEditing && _expenseViewModel.Approved)
-    {
-        <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
-    }
+
     <QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
         <PropertyColumn Property="approval => approval.Approver.FullName" Title="Approver's Name'" />
         @* <PropertyColumn Property="approval => approval.LastUpdated" /> *@
         @* <PropertyColumn Property="approval => approval.IsApproved" /> *@
-        <TemplateColumn Context="approval" Title="Approval Status">
+        <TemplateColumn Context="approval" Title="Approval Status" >
             @if (approval.IsApproved)
             {
                 <span class="text-success"><b>Approved</b></span>
@@ -232,6 +230,7 @@ else
             {
                 <span class="text-danger"><b>Not Approved</b></span>
             }
+
         </TemplateColumn>
         @if (IsEditing)
         {
@@ -252,7 +251,14 @@ else
                     Approve
                 </button>
             }
+            @if (!IsEditing && !approval.IsApproved)
+            {
+                <button class="btn btn-success" @onclick="ReturnToSubmitter">Return to Requestor</button>
+
+            }
         </TemplateColumn>
+
+
 
     </QuickGrid>
 }
@@ -280,9 +286,9 @@ else
             </div>
         </TemplateColumn>
         <PropertyColumn Property="note => note.WrittenBy.FullName" />
-        <PropertyColumn Property="note => note.WrittenBy.EmailAddress" />
+        @* <PropertyColumn Property="note => note.WrittenBy.EmailAddress" /> *@
         <PropertyColumn Property="note => note.DateAdded" />
-        <PropertyColumn Property="note => note.ExpenseId" />
+        @* <PropertyColumn Property="note => note.ExpenseId" /> *@
 
         @* <TemplateColumn Context="note"> *@
         @*     <a href="@($"notes/edit?id={note.Id}")">Edit</a> | *@

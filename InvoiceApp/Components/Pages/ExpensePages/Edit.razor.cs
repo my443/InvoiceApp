@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
+using System.Diagnostics.Eventing.Reader;
 
 namespace InvoiceApp.Components.Pages.ExpensePages
 {
@@ -38,7 +39,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private List<Department> _departments;
         private List<GLAccount> _glaccounts;
 
-        public bool IsEditing { get; set; } 
+        public bool IsEditing { get; set; }
 
         protected override async Task OnInitializedAsync()
         {
@@ -171,6 +172,22 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             RefreshApprovalList();
         }
 
+        private async Task ReturnToSubmitter()
+        {
+            Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 1);         // 1 is "Created"
+            await context.SaveChangesAsync();
+            SaveAndRefreshPage();
+            StateHasChanged();
+        }
+
+        private async Task MoveToAccountsPayableProcessing()
+        {
+            Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 3);         // 1 is "Confirmed For Processing"
+            await context.SaveChangesAsync();
+            SaveAndRefreshPage();
+            StateHasChanged();
+        }
+
         private void FilterEmployees(ChangeEventArgs e)
         {
             employeeSearchTerm = e.Value.ToString();
@@ -262,6 +279,11 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private void SaveAndRefreshPage()
         {
             UpdateExpense();
+
+            if (AllItemsAreApproved()) { 
+                MoveToAccountsPayableProcessing(); 
+            }
+
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
 
@@ -380,6 +402,13 @@ namespace InvoiceApp.Components.Pages.ExpensePages
                 approval.IsApproved = true;
                 await context.SaveChangesAsync();
             }
+            RefreshApprovalList();
+        }
+
+        private bool AllItemsAreApproved()
+        {
+            RefreshApprovalList();            
+            return _approvals.All(a => a.IsApproved);
         }
 
         private async Task SubmitExpense()
@@ -398,7 +427,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         public bool ToggleIsEditing()
         {
             RefreshApprovalList();
- 
+
 
             if (!_approvals.Any())
             {
@@ -406,18 +435,20 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             }
 
             IsEditing = !IsEditing;
-            
-            
-            if(!IsEditing)
+
+            MoveToRequiresApproval();
+
+            return true;
+        }
+
+        private void MoveToRequiresApproval()
+        {
+            if (!IsEditing && !AllItemsAreApproved())
             {
                 Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 2);         // 2 is "Requires Approval"
 
             }
             context.SaveChanges();
-
-            return true;
         }
-
-
     }
 }

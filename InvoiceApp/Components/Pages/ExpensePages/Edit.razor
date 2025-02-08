@@ -19,7 +19,7 @@
 <div class="row">
     <div class="col-4">
         <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
-        @_approvals.All(a => a.IsApproved);
+
     </div>
     <div class="col-8">
         <div class="text-end">
@@ -31,7 +31,7 @@
                 <button type="button" class="btn btn-primary" @onclick="SaveAndReturnToList">Save And Return To List</button>
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#noApproversModal" @onclick="()=> SubmitExpense()">Submit Expense</button>
             }
-            <button @onclick='() => _expenseViewModel.ToggleSection("AllSections")' class="btn btn-primary">@(_expenseViewModel.sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
+            <button @onclick='() => ToggleSection("AllSections")' class="btn btn-primary">@(sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
 
             <p>@(IsEditing ? "Editing" : "Locked")</p>
         </div>
@@ -116,9 +116,9 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <a @onclick='() => _expenseViewModel.ToggleSection("ExpenseDetails")' style="cursor: pointer;">
+            <a @onclick='() => ToggleSection("ExpenseDetails")' style="cursor: pointer;">
                 <h3>
-                    @(_expenseViewModel.SectionToggleIcon("ExpenseDetails"))
+                    @(SectionToggleIcon("ExpenseDetails"))
                     Expense Details
                 </h3>
             </a>
@@ -126,7 +126,7 @@ else
     </div>
 </div>
 
-@if (_expenseViewModel.sectionVisibility["ExpenseDetails"])
+@if (sectionVisibility["ExpenseDetails"])
 {
     @if (IsEditing)
     {
@@ -190,9 +190,9 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <a @onclick='() => _expenseViewModel.ToggleSection("Approvals")' style="cursor: pointer;">
+            <a @onclick='() => ToggleSection("Approvals")' style="cursor: pointer;">
                 <h3>
-                    @(_expenseViewModel.SectionToggleIcon("Approvals"))
+                    @(SectionToggleIcon("Approvals"))
                     Approvals
                 </h3>
             </a>
@@ -200,7 +200,7 @@ else
     </div>
 </div>
 
-@if (_expenseViewModel.sectionVisibility["Approvals"])
+@if (sectionVisibility["Approvals"])
 {
     @if (IsEditing)
     {
@@ -267,9 +267,9 @@ else
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <a @onclick='() => _expenseViewModel.ToggleSection("Notes")' style="cursor: pointer;">
+            <a @onclick='() => ToggleSection("Notes")' style="cursor: pointer;">
                 <h3>
-                    @(_expenseViewModel.SectionToggleIcon("Notes"))
+                    @(SectionToggleIcon("Notes"))
                     Notes
                 </h3>
             </a>
@@ -277,7 +277,7 @@ else
     </div>
 </div>
 
-@if (_expenseViewModel.sectionVisibility["Notes"])
+@if (sectionVisibility["Notes"])
 {
     <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
         <TemplateColumn Title="Note Text" Class="w-50">
@@ -296,14 +296,16 @@ else
         @*     <a href="@($"notes/delete?id={note.Id}")">Delete</a> *@
         @* </TemplateColumn> *@
     </QuickGrid>
+
+    <NotesGrid Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)" />
 }
 <hr />
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
-            <a @onclick='() => _expenseViewModel.ToggleSection("Images")' style="cursor: pointer;">
+            <a @onclick='() => ToggleSection("Images")' style="cursor: pointer;">
                 <h3>
-                    @(_expenseViewModel.SectionToggleIcon("Images"))
+                    @(SectionToggleIcon("Images"))
                     Attachments
                 </h3>
             </a>
@@ -311,7 +313,7 @@ else
     </div>
 </div>
 
-@if (_expenseViewModel.sectionVisibility["Images"])
+@if (sectionVisibility["Images"])
 {
     @if (IsEditing)
     {

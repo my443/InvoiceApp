@@ -26,13 +26,4 @@
     </TemplateColumn>
 </QuickGrid>
 
-@code {
-    private ApplicationDbContext context = default!;
 
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
-    }
-
-    public async ValueTask DisposeAsync() => await context.DisposeAsync();
-}

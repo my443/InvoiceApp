@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.JSInterop;
 using System.Diagnostics.Eventing.Reader;
+using InvoiceApp.Components.Icons;
 
 namespace InvoiceApp.Components.Pages.ExpensePages
 {
@@ -41,6 +42,29 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
         public bool IsEditing { get; set; }
 
+        private bool UserCanApprove { get; set; }
+        private bool UserCanProcess { get; set; }
+
+        public bool Approved { get; set; } = false;
+
+        [Precision(18, 2)]
+        public double TotalAmount { get; set; }
+        [Precision(18, 2)]
+        public double TotalHst { get; set; }
+        public IQueryable<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>().AsQueryable();
+
+        public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
+            {
+                { "ExpenseSummary", true },
+                { "ExpenseDetails", true },
+                { "Approvals", true },
+                { "Images", true },
+                { "Notes", true },
+                { "NoteModal", false },
+                { "DeleteApproverModal", false },
+                { "AllSections", false },
+            };
+
         protected override async Task OnInitializedAsync()
         {
             context = DbFactory.CreateDbContext();
@@ -67,7 +91,6 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             filteredEmployees = employees;
 
             RefreshAttachmentsList();
-
             await RefreshApprovalList();
             _departments = await context.Departments.ToListAsync();
             _glaccounts = await context.GLAccounts.ToListAsync();
@@ -449,6 +472,132 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             }
             context.SaveChanges();
+        }
+
+
+        // Start with ViewModel
+        public int AddExpense(Expense expense)
+        {
+            context.Expenses.Add(expense);
+            context.SaveChanges();
+            return expense.Id;
+        }
+
+        public Expense CreateExpense(Expense newExpense)
+        {
+            return newExpense;
+        }
+
+        // Read an expense by ID
+        public Expense GetExpense(int id)
+        {
+            return context.Expenses.FirstOrDefault(e => e.Id == id);
+        }
+
+
+
+        // Delete an expense by ID
+        public void DeleteExpense(int id)
+        {
+            Expense expenseToDelete = context.Expenses.FirstOrDefault(e => e.Id == id);
+            if (expenseToDelete != null)
+            {
+                context.Expenses.Remove(expenseToDelete);
+                context.SaveChanges();
+            }
+        }
+
+        // Get the list of expenses
+        public List<Expense> GetExpensesList()
+        {
+            return context.Expenses.ToList();
+        }
+
+        // Get the list of expense details for a specific expense
+        public IQueryable<ExpenseDetail> GetExpenseDetails(int expenseId)
+        {
+            List<ExpenseDetail> expenseDetails = context.ExpenseDetails.Where(e => e.ExpenseId == expenseId).ToList();
+            ExpenseDetails = expenseDetails.AsQueryable();
+
+            return ExpenseDetails;
+        }
+
+        // Ensure that the sum of all ExpenseDetails is equal to the TotalAmount and TotalHst
+        public void EnsureExpenseDetailsSum(Expense expense)
+        {
+            decimal currentDetailsAmountTotal = context.ExpenseDetails.Where(ed => ed.ExpenseId == expense.Id).Sum(ed => ed.Amount);
+            decimal currentDetailsHstTotal = context.ExpenseDetails.Where(ed => ed.ExpenseId == expense.Id).Sum(ed => ed.Hst);
+
+            Console.WriteLine($"Current Details Amount Total: {currentDetailsAmountTotal}");
+            Console.WriteLine($"Current Details HST Total: {currentDetailsHstTotal}");
+
+            if (currentDetailsAmountTotal != expense.TotalAmount || currentDetailsHstTotal != expense.TotalHst)
+            {
+                decimal amountDifference = expense.TotalAmount - currentDetailsAmountTotal;
+                decimal hstDifference = expense.TotalHst - currentDetailsHstTotal;
+
+                GLAccount glAccount = context.GLAccounts.FirstOrDefault(a => a.Id == -1);
+                Department department = context.Departments.FirstOrDefault(d => d.Id == -1);
+
+                // Add a new ExpenseDetail to balance the amounts
+                ExpenseDetail balancingDetail = new ExpenseDetail
+                {
+                    Account = glAccount, // Set appropriate GLAccount
+                    Department = department, // Set appropriate Department
+                    Amount = amountDifference,
+                    Hst = hstDifference,
+                    ExpenseId = expense.Id
+                };
+
+                expense.ExpenseDetails.Add(balancingDetail);
+                context.SaveChanges();
+            }
+        }
+
+        /// <summary>
+        /// Toggles the visibility of a section. Based on the section name that is part of the dictionary.
+        /// </summary>
+        /// <param name="sectionName"></param>
+        public void ToggleSection(string sectionName)
+        {
+            if (sectionName == "AllSections")
+            {
+                ToggleAllSections();
+            }
+            if (sectionVisibility.ContainsKey(sectionName))
+            {
+                sectionVisibility[sectionName] = !sectionVisibility[sectionName];
+            }
+        }
+
+        public RenderFragment SectionToggleIcon(string sectionName)
+        {
+            if (sectionVisibility.ContainsKey(sectionName))
+            {
+                return sectionVisibility[sectionName] ?
+                    (RenderFragment)(builder => { builder.OpenComponent<SubtractIcon>(0); builder.CloseComponent(); })
+                    : (RenderFragment)(builder => { builder.OpenComponent<AddIcon>(0); builder.CloseComponent(); });
+            }
+            //return "none";
+            return new RenderFragment(builder => { });
+        }
+
+        private void ToggleAllSections()
+        {
+            if (!sectionVisibility["AllSections"])
+            {
+                foreach (var section in sectionVisibility.Keys.Where(key => key != "AllSections").ToList())
+                {
+                    sectionVisibility[section] = false;
+                }
+            }
+            else
+            {
+                foreach (var section in sectionVisibility.Keys.Where(key => key != "AllSections").ToList())
+                {
+                    sectionVisibility[section] = true;
+                }
+            }
         }
     }
 }

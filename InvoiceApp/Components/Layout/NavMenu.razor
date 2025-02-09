@@ -1,6 +1,7 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 @* <div class="top-row ps-3 navbar navbar-dark" style="background-color: rgb(5, 39, 103);">
     <div class="container-fluid">
@@ -10,11 +11,11 @@
 
 <input type="checkbox" title="Navigation menu" class="navbar-toggler" /> *@
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()" style="background-color: rgb(5, 39, 103);width:250px;">
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()" style="background-color: rgb(5, 39, 103);width:@(NavBarWidth)px;">
     <nav class="nav flex-column">
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> <span style="display:@ShowMenuValue">Home</span>
             </NavLink>
         </div>
         <div class="nav-item px-3">
@@ -32,42 +33,48 @@
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Logout
             </NavLink>
         </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="ToggleMenu">
+                <span style="font-size:16px;font-weight:bold;"><i class="bi @ShowMenuValue"></i></span>
+                 Hide Menu
+            </NavLink>
+        </div>
         <!--
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
-            </NavLink>
+        <NavLink class="nav-link" href="auth">
+        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Auth Required
+        </NavLink>
         </div>
 
         <AuthorizeView>
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                        </button>
-                    </form>
-                </div>
-            </Authorized>
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-            </NotAuthorized>
+        <Authorized>
+        <div class="nav-item px-3">
+        <NavLink class="nav-link" href="Account/Manage">
+        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> @context.User.Identity?.Name
+        </NavLink>
+        </div>
+        <div class="nav-item px-3">
+        <form action="Account/Logout" method="post">
+        <AntiforgeryToken />
+        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+        <button type="submit" class="nav-link">
+        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+        </button>
+        </form>
+        </div>
+        </Authorized>
+        <NotAuthorized>
+        <div class="nav-item px-3">
+        <NavLink class="nav-link" href="Account/Register">
+        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Register
+        </NavLink>
+        </div>
+        <div class="nav-item px-3">
+        <NavLink class="nav-link" href="Account/Login">
+        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+        </NavLink>
+        </div>
+        </NotAuthorized>
         </AuthorizeView>
         -->
     </nav>
@@ -75,6 +82,8 @@
 
 @code {
     private string? currentUrl;
+    private string ShowMenuValue = "bi-arrow-bar-left";
+    private int NavBarWidth = 250;
 
     protected override void OnInitialized()
     {
@@ -86,6 +95,20 @@
     {
         currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
+    }
+
+    public void ToggleMenu()
+    {
+        if (ShowMenuValue == "bi-arrow-bar-left")
+        {
+            ShowMenuValue = "bi-arrow-bar-right";
+            NavBarWidth = 65;
+        }
+        else
+        {
+            ShowMenuValue = "bi-arrow-bar-left";
+            NavBarWidth = 250;
+        }
     }
 
     public void Dispose()

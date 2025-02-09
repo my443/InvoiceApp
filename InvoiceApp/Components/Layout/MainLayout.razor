@@ -7,26 +7,40 @@
 
 <div class="page">
 
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+    @* <div class="sidebar"> *@
+    @*     <NavMenu /> *@
+    @* </div> *@
 
     <main>
-        <div class="top-row px-4" style="color:white">
+        <div class="row" style="background-color: rgb(5, 39, 103);height:50px;color:white;">
+            <div class="col-md-6 d-flex justify-content-start align-items-center" >
 
-            @if (currentUser != null)
-            {
-                <p>@currentUser.UserName</p>
-            }
-            else
-            {
-                <p>No Current User</p>
-            }
+                <span style="font-size:1.5em;"><i class="bi bi-heptagon-fill" style="color:rgb(204, 153, 51);margin-left:25px;margin-right:10px;"></i>Invoice Flow Professional</span>
+
+            </div>
+            <div class="col-md-6 d-flex justify-content-end align-items-center pr-30">
+
+
+                 @if (currentUser != null) 
+                 { 
+                     <span style="margin-right:30px">@currentUser.UserName</span> 
+                 } 
+                 else 
+                 {
+                    <span style="margin-right:30px">No Current User</span>
+                } 
+             </div>
         </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
+        <div class="row" style="display: flex;">
+            <div style="width: auto;">
+                <NavMenu />
+            </div>
+            <div style="flex: 1;">
+                <article class="content px-4">
+                    @Body
+                </article>
+            </div>
+        </div>
     </main>
 </div>
 
@@ -43,7 +57,7 @@
     protected override async Task OnInitializedAsync()
     {
         NavigationManager.LocationChanged += OnLocationChanged;
-        await LoadCurrentUserAsync();        
+        await LoadCurrentUserAsync();
     }
 
     private async Task LoadCurrentUserAsync()
@@ -65,5 +79,5 @@
     }
 
 
-    
+
 }

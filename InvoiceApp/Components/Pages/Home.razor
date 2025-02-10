@@ -3,9 +3,37 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<div class="row d-flex align-items-stretch">
+    <div class="col-md-4 d-flex">
+        <div class="card flex-fill">
+            <div class="card-body">
+                <h5 class="card-title">My Submissions</h5>
+                <p class="card-text">These are the expenses that I submitted for approval and processing</p>
+                <a href="#" class="btn btn-primary mt-auto">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex">
+        <div class="card flex-fill">
+            <div class="card-body">
+                <h5 class="card-title">My Approvals</h5>
+                <p class="card-text">These are the expenses that I have been asked to approve.</p>
+                <a href="#" class="btn btn-primary mt-auto">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 d-flex">
+        <div class="card flex-fill">
+            <div class="card-body">
+                <h5 class="card-title">My Processing</h5>
+                <p class="card-text">These are the expenses that need to be processed and paid.</p>
+                <a href="#" class="btn btn-primary mt-auto">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+</div>
 <p>
     @UserService.GetCurrentEmployee().Result.FullName
 </p>
+
+

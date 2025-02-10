@@ -13,17 +13,39 @@
 <p>
     <a href="expenses/create">Create New</a>
 </p>
+<style>
+    .table tr, .table td {
+        padding: 2px;
+        margin: 2px;
+    }
+</style>
+<table class="table">
+    @foreach (Expense expense in context.Expenses)
+    {
+        <tr>
+            <td style="vertical-align: middle;margin:0px">@expense.Vendor</td>
+            <td style ="vertical-align: middle;">@expense.TotalAmount</td>
+            <td style="vertical-align: middle;">@expense.TotalHst</td>
+            <td style="vertical-align: middle;">
+                <a class="btn btn-primary" href="@($"expenses/edit?id={expense.Id}")"><i class="bi bi-pencil-square"></i></a> | 
+                <a class="btn btn-danger" href="@($"expenses/delete?id={expense.Id}")"><i class="bi bi-trash3-fill"></i></a>
+            </td>
+        </tr>
+    }
 
-<QuickGrid Class="table" Items="context.Expenses">
-    <PropertyColumn Property="expense => expense.Vendor" />
-    <PropertyColumn Property="expense => expense.TotalAmount" />
-    <PropertyColumn Property="expense => expense.TotalHst" />
+</table>
 
-    <TemplateColumn Context="expense">
-        <a href="@($"expenses/edit?id={expense.Id}")">Edit</a> |
-        <a href="@($"expenses/details?id={expense.Id}")">Details</a> |
-        <a href="@($"expenses/delete?id={expense.Id}")">Delete</a>
-    </TemplateColumn>
-</QuickGrid>
+@* <QuickGrid Class="table" Items="context.Expenses"> *@
+@*     <PropertyColumn Property="expense => expense.Vendor" /> *@
+@*     <PropertyColumn Property="expense => expense.TotalAmount" /> *@
+@*     <PropertyColumn Property="expense => expense.TotalHst" /> *@
+
+@*     <TemplateColumn Context="expense"> *@
+@*         <span style="font-size:20px"> *@
+@*             <a class="btn btn-primary" href="@($"expenses/edit?id={expense.Id}")"><i class="bi bi-pencil-square"></i></a> | *@
+@*             <a class="btn btn-danger" href="@($"expenses/delete?id={expense.Id}")"><i class="bi bi-trash3-fill"></i></a> *@
+@*         </span> *@
+@*     </TemplateColumn> *@
+@* </QuickGrid> *@
 
 

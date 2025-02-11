@@ -15,6 +15,7 @@
 
 <p>
     <a href="expenses/create">Create New</a>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>
 </p>
 <style>
     .table tr, .table td {
@@ -65,4 +66,27 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addNoteModalLabel">Add Note</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @* <EditForm Model="newNote" OnValidSubmit="AddNote"> *@
+                @*     <DataAnnotationsValidator /> *@
+                @*     <ValidationSummary class="text-danger" role="alert" /> *@
+                @*     <div class="mb-3"> *@
+                @*         <label for="noteText" class="form-label">Note:</label> *@
+                @*         <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" rows="7" /> *@
+                @*         <ValidationMessage For="() => newNote.NoteText" class="text-danger" /> *@
+                @*     </div> *@
+                @*     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button> *@
+                @* </EditForm> *@
+            </div>
+        </div>
+    </div>
+</div>
 

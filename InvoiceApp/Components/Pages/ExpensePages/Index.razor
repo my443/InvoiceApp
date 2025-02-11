@@ -5,6 +5,9 @@
 @using InvoiceApp.Data
 @implements IAsyncDisposable
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
 
 <PageTitle>Index</PageTitle>
 
@@ -26,7 +29,7 @@
     <th>Total HST</th>
     <th>Action</th>
     </thead>
-    @foreach (Expense expense in context.Expenses)
+    @foreach (Expense expense in Expenses)
     {
         <tr>
             <td style="vertical-align: middle;margin:0px">@expense.Vendor</td>
@@ -34,11 +37,32 @@
             <td style="vertical-align: middle;">@expense.TotalHst</td>
             <td style="vertical-align: middle;">
                 <a class="btn btn-primary" href="@($"expenses/edit?id={expense.Id}")"><i class="bi bi-pencil-square"></i> Edit</a> |
-                <a class="btn btn-danger" href="@($"expenses/delete?id={expense.Id}")"><i class="bi bi-trash3-fill"></i> Delete</a>
+                <button type="button" a class="btn btn-danger" 
+                   data-bs-toggle="modal" data-bs-target="#deleteInvoiceModal"
+                    @onclick="()=>OpenDeleteModal(expense.Id)"><i class="bi bi-trash3-fill"></i> Delete</button>
             </td>
         </tr>
     }
-
 </table>
+
+
+
+<div class="modal " id="deleteInvoiceModal" tabindex="-1" aria-labelledby="deleteInvoiceModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteInvoiceModal">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this expense submission?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" @onclick="ConfirmDeleteExpense">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 

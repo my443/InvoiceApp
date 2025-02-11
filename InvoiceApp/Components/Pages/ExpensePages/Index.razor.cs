@@ -9,11 +9,13 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private ApplicationDbContext context = default!;
         private int selectedExpenseForDeletion;
         private List<Expense> Expenses = new List<Expense>();
+        private Expense NewExpense = new Expense();
 
         protected override void OnInitialized()
         {
             context = DbFactory.CreateDbContext();
             LoadExpensesList();
+            GenerateNewExpense();
         }
 
         private void LoadExpensesList()
@@ -21,7 +23,18 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             Expenses = context.Expenses.Where(e => e.IsDeleted == false).ToList();
         }
 
+        private void GenerateNewExpense()
+        {
+            NewExpense = new Expense();
+            NewExpense.IsDeleted = false;
+            ExpenseStatus status = context.ExpenseStatus.Where(e => e.Id == 2).FirstOrDefault();
+            Employee employee = context.Employees.Where(e => e.Id == 2).FirstOrDefault();           // TODO - Must remove this hardcoded value
+            NewExpense.IsDeleted = false;
+            NewExpense.ExpenseStatus = status;
+            NewExpense.SubmittedBy = employee;
+            NewExpense.Vendor = "<<No Vendor Added>>";
 
+        }
 
         private void OpenDeleteModal(int id)
         {
@@ -45,6 +58,14 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             // Hide the modal
             var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#deleteInvoiceModal");
             await modal.InvokeVoidAsync("hide");
+        }
+
+        private async Task AddNewExpense()
+        {
+            context.Expenses.Add(NewExpense);
+            await context.SaveChangesAsync();
+            GenerateNewExpense();
+            LoadExpensesList();
         }
 
         public async ValueTask DisposeAsync() => await context.DisposeAsync();

@@ -33,6 +33,7 @@
                             <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
                         </div>
                     </div>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
                     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
                 </EditForm>
             </div>
@@ -83,5 +84,9 @@
         NewExpense.Vendor = "<<No Vendor Added>>";
     }
 
+    private void Cancel()
+    {
+        GenerateNewExpense();
+    }
 
 }

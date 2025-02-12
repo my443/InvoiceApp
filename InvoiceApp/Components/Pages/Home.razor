@@ -1,5 +1,7 @@
 ﻿@page "/"
 @inject InvoiceApp.Services.UserService UserService
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
 
 
 <PageTitle>Home</PageTitle>
@@ -9,6 +11,10 @@
         <h3 class="float-start">My Invoice Centre</h3>
     </div>
 </div>
+<p>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addExpenseModal" style="height:60px;font-weight:bold">
+        <i class="bi bi-plus-square"></i>  Quick-Add An Expense</button>
+</p>
 <hr />
 
 <div class="row d-flex align-items-stretch">
@@ -50,5 +56,12 @@
     </div>
 </div>
 
+<InvoiceApp.Components.Pages.ExpensePages.QuickAddExpense OnClose="RefreshExpenses" />
 
 
+@code{
+    private void RefreshExpenses()
+    {
+        // pass
+    }
+}

@@ -68,45 +68,5 @@
 </div>
 
 
-<div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addExpenseModalLabel">Quick-Add An Expense</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <EditForm Model="NewExpense" OnValidSubmit="AddNewExpense">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary class="text-danger" role="alert" />
-                    <div class="row">
-                        <div class="mb-3">
-                            <label for="totalhst" class="form-label">Vendor:</label>
-                            <InputText id="totalhst" @bind-Value="NewExpense.Vendor" class="form-control" />
-                            <ValidationMessage For="() => NewExpense.Vendor" class="text-danger" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="mb-1 col-md-6">
-                            <label for="totalamount" class="form-label">Total Amount:</label>
-                            <InputNumber id="totalamount" @bind-Value="NewExpense.TotalAmount" class="form-control" />
-                            <ValidationMessage For="() => NewExpense.TotalAmount" class="text-danger" />
-                        </div>
-                        <div class="mb-1 col-md-6">
-                            <label for="totalhst" class="form-label">Total HST:</label>
-                            <InputNumber id="totalhst" @bind-Value="NewExpense.TotalHst" class="form-control" />
-                            <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
-                        </div>
-                    </div>
-                    <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
-                </EditForm>
-            </div>
-            @*         <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" rows="7" /> *@
-            @*         <ValidationMessage For="() => newNote.NoteText" class="text-danger" /> *@
-            <div class="modal-footer">
-                <p>For more complex expenses, choose <u>Submit and Edit</u>. In the Expense Details you can add multiple approvers, split the expense between multiple accounts, and more.</p>
-            </div>
-        </div>
-    </div>
-</div>
+<QuickAddExpense OnClose="LoadExpensesList" />
 

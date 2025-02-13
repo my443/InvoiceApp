@@ -35,6 +35,27 @@
                             <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="mb-1 col-md-6">
+                            <label for="department" class="form-label">Department</label>
+                            <InputSelect @bind-Value="NewExpenseDetail.DepartmentId" class="form-select">
+                                @foreach (var department in _departments)
+                                {
+                                    <option value="@department.Id">@department.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="mb-1 col-md-6">
+                            <label for="accounts" class="form-label">GL Account</label>
+                            <InputSelect @bind-Value="NewExpenseDetail.AccountId" class="form-select">
+                                @foreach (var account in _glaccounts)
+                                {
+                                    <option value="@account.Id">@account.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+
                     <div>
                         <h5>Select Invoice Image</h5>
                         <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
@@ -71,7 +92,7 @@
                         <h5>Note</h5>
                         <InputTextArea id="noteText" @bind-Value="NoteText" class="form-control" rows="2" />
                     </div>
-                    <hr/>
+                    <hr />
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
                     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
                 </EditForm>

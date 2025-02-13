@@ -2,6 +2,7 @@
 using InvoiceApp.Models;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
+using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.Components.Pages.Shared
 {
@@ -23,6 +24,10 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private List<Employee> filteredEmployees = new List<Employee>();
 
+        private List<Department> _departments;
+        private List<GLAccount> _glaccounts;
+        private ExpenseDetail NewExpenseDetail = new ExpenseDetail { AccountId = -1, DepartmentId = -1 };
+
         private void CloseModal()
         {
             OnClose.InvokeAsync();
@@ -36,7 +41,10 @@ namespace InvoiceApp.Components.Pages.Shared
         {
             context = DbFactory.CreateDbContext();
             GenerateNewExpense();
+
             filteredEmployees = context.Employees.ToList();
+            _departments = context.Departments.ToList();
+            _glaccounts = context.GLAccounts.ToList();
         }
 
         private async Task AddNewExpense()
@@ -51,8 +59,10 @@ namespace InvoiceApp.Components.Pages.Shared
                 await UploadFileAsync(BrowserFile);
             }
 
+            // Make the supporting records (eg approvals, Notes, ExpenseDetails)
             GenerateApproval(newExpenseId);
             GenerateNote(newExpenseId);
+            GenerateExpenseDetail(newExpenseId);
 
             CloseModal();
             Cancel();           // Reset all variables.
@@ -143,7 +153,7 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private void GenerateApproval(int newExpenseId)
         {
-            if (selectedEmployeeId != null)
+            if (selectedEmployeeId != null && selectedEmployeeId != 0)
             {
                 Approval newApproval = new Approval();
                 newApproval.Approver = context.Employees.Where(e => e.Id == selectedEmployeeId).FirstOrDefault();
@@ -166,6 +176,17 @@ namespace InvoiceApp.Components.Pages.Shared
                 context.Notes.Add(newNote);
                 context.SaveChanges();
             }
+        }
+
+        private void GenerateExpenseDetail(int NewExpenseId)
+        {
+            Expense expense = context.Expenses.Where(e => e.Id == NewExpenseId).FirstOrDefault();
+            NewExpenseDetail.ExpenseId = NewExpenseId;
+            NewExpenseDetail.Amount = expense.TotalAmount;            
+            NewExpenseDetail.Hst = expense.TotalHst;
+
+            context.Add(NewExpenseDetail);
+            context.SaveChanges();
         }
     }
 }

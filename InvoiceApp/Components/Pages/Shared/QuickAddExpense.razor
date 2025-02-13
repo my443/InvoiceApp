@@ -1,7 +1,9 @@
 ﻿@using InvoiceApp.Models
 @using InvoiceApp.Data
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Forms
 @inject IDbContextFactory<InvoiceApp.Data.ApplicationDbContext> DbFactory
+@inject IWebHostEnvironment WebHostEnvironment
 
 <div class="modal fade" id="addExpenseModal" tabindex="-1" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -33,6 +35,18 @@
                             <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
                         </div>
                     </div>
+                    <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
+                        <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
+                            <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
+                            <span style="display: block; width: 100%; height: 100%;margin-top:10px">Tap here to select a file</span>
+                        </div>
+                    </label>
+                    @if (BrowserFile != null)
+                    {
+                        <div>
+                            <b>Selected File: </b>@BrowserFile.Name<br />
+                        </div>
+                    }
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
                     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
                 </EditForm>
@@ -50,6 +64,13 @@
     [Parameter]
     public EventCallback OnClose { get; set; }
 
+    private bool uploadSuccess = false;
+    private bool uploadError = false;
+    private InputFile inputFileElement;
+    IBrowserFile BrowserFile;
+
+
+
     private void CloseModal()
     {
         OnClose.InvokeAsync();
@@ -57,6 +78,7 @@
 
     private ApplicationDbContext context = default!;
     private Expense NewExpense = new Expense();
+
 
     protected override void OnInitialized()
     {
@@ -68,6 +90,12 @@
     {
         context.Expenses.Add(NewExpense);
         await context.SaveChangesAsync();
+        int newExpenseId = NewExpense.Id;
+
+        if (BrowserFile != null)
+        {
+            await UploadFileAsync(BrowserFile);
+        }
         GenerateNewExpense();
         CloseModal();
     }
@@ -84,9 +112,71 @@
         NewExpense.Vendor = "<<No Vendor Added>>";
     }
 
+    private void GenerateNewBrowserFile()
+    {
+        BrowserFile = null;
+    }
+
     private void Cancel()
     {
         GenerateNewExpense();
+        GenerateNewBrowserFile();
     }
+
+    // File Upload Section
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        BrowserFile = e.File;
+    }
+
+    private int SaveFilenameRecordToDatabase(IBrowserFile file)
+    {
+        // Get the file extension
+        string fileExtension = Path.GetExtension(file.Name);
+        FileType fileType = GetFileType(fileExtension);
+
+        // Save the image record to the database
+        var image = new Image
+            {
+                FileName = file.Name,
+                UploadTime = DateTime.Now,
+                UploadedBy = NewExpense.SubmittedBy,
+                ExpenseId = NewExpense.Id,
+                FileType = fileType,
+            };
+
+        context.Images.Add(image);
+        context.SaveChanges();   // Save the filename to the database
+                                 // RefreshAttachmentsList();
+        return image.Id;
+    }
+
+    // Returns FileType or default to 'Other'
+    private FileType GetFileType(string fileExtension)
+    {
+        FileType fileType = context.FileTypes.FirstOrDefault(ft => ft.Extension == fileExtension);
+
+        if (fileType is null)
+        {
+            fileType = context.FileTypes.FirstOrDefault(ft => ft.Id == -1); // Default to 'Other'
+        }
+
+        return fileType;
+    }
+
+    private async Task UploadFileAsync(IBrowserFile file)
+    {
+        int imageDbID = SaveFilenameRecordToDatabase(file);
+        string filename = $"{imageDbID.ToString()}-{file.Name}";
+
+        var uploadsFolder = Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads");
+        Directory.CreateDirectory(uploadsFolder);
+        var filePath = Path.Combine(uploadsFolder, filename);
+
+        await using var fileStream = new FileStream(filePath, FileMode.Create);
+        await file.OpenReadStream().CopyToAsync(fileStream);
+    }
+
+
 
 }

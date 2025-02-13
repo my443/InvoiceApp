@@ -47,6 +47,15 @@
                             <b>Selected File: </b>@BrowserFile.Name<br />
                         </div>
                     }
+                    <div>
+                        <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control" style="appearance: auto;-webkit-appearance: auto;-moz-appearance: auto;">
+                            <option value="">-- Select an Employee --</option>
+                            @foreach (var employee in filteredEmployees)
+                            {
+                                <option value="@employee.Id">@employee.FullName</option>
+                            }
+                        </InputSelect>
+                    </div>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
                     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
                 </EditForm>
@@ -69,7 +78,11 @@
     private InputFile inputFileElement;
     IBrowserFile BrowserFile;
 
+    // For Approvers
+    private string employeeSearchTerm = string.Empty;
+    private int selectedEmployeeId;
 
+    private List<Employee> filteredEmployees = new List<Employee>();
 
     private void CloseModal()
     {
@@ -84,6 +97,7 @@
     {
         context = DbFactory.CreateDbContext();
         GenerateNewExpense();
+        filteredEmployees = context.Employees.ToList();
     }
 
     private async Task AddNewExpense()
@@ -92,11 +106,14 @@
         await context.SaveChangesAsync();
         int newExpenseId = NewExpense.Id;
 
+
         if (BrowserFile != null)
         {
             await UploadFileAsync(BrowserFile);
         }
+        GenerateApproval(newExpenseId);
         GenerateNewExpense();
+
         CloseModal();
     }
 
@@ -175,6 +192,19 @@
 
         await using var fileStream = new FileStream(filePath, FileMode.Create);
         await file.OpenReadStream().CopyToAsync(fileStream);
+    }
+
+    private void GenerateApproval(int newExpenseId)
+    {
+        if (selectedEmployeeId != null)
+        {
+            Approval newApproval = new Approval();
+            newApproval.Approver = context.Employees.Where(e => e.Id == selectedEmployeeId).FirstOrDefault();
+            newApproval.ExpenseId = newExpenseId;
+            newApproval.IsApproved = false;
+            context.Approvals.Add(newApproval);
+            context.SaveChanges();
+        }
     }
 
 

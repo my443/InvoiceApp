@@ -35,27 +35,43 @@
                             <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
                         </div>
                     </div>
-                    <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
-                        <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
-                            <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
-                            <span style="display: block; width: 100%; height: 100%;margin-top:10px">Tap here to select a file</span>
-                        </div>
-                    </label>
-                    @if (BrowserFile != null)
-                    {
-                        <div>
-                            <b>Selected File: </b>@BrowserFile.Name<br />
-                        </div>
-                    }
                     <div>
-                        <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control" style="appearance: auto;-webkit-appearance: auto;-moz-appearance: auto;">
-                            <option value="">-- Select an Employee --</option>
-                            @foreach (var employee in filteredEmployees)
-                            {
-                                <option value="@employee.Id">@employee.FullName</option>
-                            }
-                        </InputSelect>
+                        <h5>Select Invoice Image</h5>
+                        <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
+                            <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
+                                <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
+                                <span style="display: block; width: 100%; height: 100%;margin-top:8px">
+                                    @if (BrowserFile != null)
+                                    {
+                                        <div>
+                                            <b>Selected File: </b>@BrowserFile.Name<br />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>Tap here to select a file</div>
+                                    }
+                                </span>
+                            </div>
+                        </label>
                     </div>
+                    <div>
+                        <h5>Select Approver</h5>
+                        <p>
+                            <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control" style="appearance: auto;-webkit-appearance: auto;-moz-appearance: auto;">
+                                <option value="0">-- Select an Employee --</option>
+                                @foreach (var employee in filteredEmployees)
+                                {
+                                    <option value="@employee.Id">@employee.FullName</option>
+                                }
+                            </InputSelect>
+                        </p>
+                    </div>
+                    <div>
+                        <h5>Note</h5>
+                        <InputTextArea id="noteText" @bind-Value="NoteText" class="form-control" rows="2" />
+                    </div>
+                    <hr/>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
                     <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
                 </EditForm>
@@ -69,144 +85,4 @@
     </div>
 </div>
 
-@code {
-    [Parameter]
-    public EventCallback OnClose { get; set; }
 
-    private bool uploadSuccess = false;
-    private bool uploadError = false;
-    private InputFile inputFileElement;
-    IBrowserFile BrowserFile;
-
-    // For Approvers
-    private string employeeSearchTerm = string.Empty;
-    private int selectedEmployeeId;
-
-    private List<Employee> filteredEmployees = new List<Employee>();
-
-    private void CloseModal()
-    {
-        OnClose.InvokeAsync();
-    }
-
-    private ApplicationDbContext context = default!;
-    private Expense NewExpense = new Expense();
-
-
-    protected override void OnInitialized()
-    {
-        context = DbFactory.CreateDbContext();
-        GenerateNewExpense();
-        filteredEmployees = context.Employees.ToList();
-    }
-
-    private async Task AddNewExpense()
-    {
-        context.Expenses.Add(NewExpense);
-        await context.SaveChangesAsync();
-        int newExpenseId = NewExpense.Id;
-
-
-        if (BrowserFile != null)
-        {
-            await UploadFileAsync(BrowserFile);
-        }
-        GenerateApproval(newExpenseId);
-        GenerateNewExpense();
-
-        CloseModal();
-    }
-
-    private void GenerateNewExpense()
-    {
-        NewExpense = new Expense();
-        NewExpense.IsDeleted = false;
-        ExpenseStatus status = context.ExpenseStatus.Where(e => e.Id == 2).FirstOrDefault();
-        Employee employee = context.Employees.Where(e => e.Id == 2).FirstOrDefault();           // TODO - Must remove this hardcoded value
-        NewExpense.IsDeleted = false;
-        NewExpense.ExpenseStatus = status;
-        NewExpense.SubmittedBy = employee;
-        NewExpense.Vendor = "<<No Vendor Added>>";
-    }
-
-    private void GenerateNewBrowserFile()
-    {
-        BrowserFile = null;
-    }
-
-    private void Cancel()
-    {
-        GenerateNewExpense();
-        GenerateNewBrowserFile();
-    }
-
-    // File Upload Section
-    private async Task HandleFileSelected(InputFileChangeEventArgs e)
-    {
-        BrowserFile = e.File;
-    }
-
-    private int SaveFilenameRecordToDatabase(IBrowserFile file)
-    {
-        // Get the file extension
-        string fileExtension = Path.GetExtension(file.Name);
-        FileType fileType = GetFileType(fileExtension);
-
-        // Save the image record to the database
-        var image = new Image
-            {
-                FileName = file.Name,
-                UploadTime = DateTime.Now,
-                UploadedBy = NewExpense.SubmittedBy,
-                ExpenseId = NewExpense.Id,
-                FileType = fileType,
-            };
-
-        context.Images.Add(image);
-        context.SaveChanges();   // Save the filename to the database
-                                 // RefreshAttachmentsList();
-        return image.Id;
-    }
-
-    // Returns FileType or default to 'Other'
-    private FileType GetFileType(string fileExtension)
-    {
-        FileType fileType = context.FileTypes.FirstOrDefault(ft => ft.Extension == fileExtension);
-
-        if (fileType is null)
-        {
-            fileType = context.FileTypes.FirstOrDefault(ft => ft.Id == -1); // Default to 'Other'
-        }
-
-        return fileType;
-    }
-
-    private async Task UploadFileAsync(IBrowserFile file)
-    {
-        int imageDbID = SaveFilenameRecordToDatabase(file);
-        string filename = $"{imageDbID.ToString()}-{file.Name}";
-
-        var uploadsFolder = Path.Combine(WebHostEnvironment.ContentRootPath, "SecureUploads");
-        Directory.CreateDirectory(uploadsFolder);
-        var filePath = Path.Combine(uploadsFolder, filename);
-
-        await using var fileStream = new FileStream(filePath, FileMode.Create);
-        await file.OpenReadStream().CopyToAsync(fileStream);
-    }
-
-    private void GenerateApproval(int newExpenseId)
-    {
-        if (selectedEmployeeId != null)
-        {
-            Approval newApproval = new Approval();
-            newApproval.Approver = context.Employees.Where(e => e.Id == selectedEmployeeId).FirstOrDefault();
-            newApproval.ExpenseId = newExpenseId;
-            newApproval.IsApproved = false;
-            context.Approvals.Add(newApproval);
-            context.SaveChanges();
-        }
-    }
-
-
-
-}

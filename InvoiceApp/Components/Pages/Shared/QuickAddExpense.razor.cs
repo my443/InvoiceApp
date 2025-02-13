@@ -77,7 +77,7 @@ namespace InvoiceApp.Components.Pages.Shared
             NewExpense.IsDeleted = false;
             NewExpense.ExpenseStatus = status;
             NewExpense.SubmittedBy = employee;
-            NewExpense.Vendor = "<<No Vendor Added>>";
+            NewExpense.Vendor = string.Empty;
         }
 
         private void GenerateNewBrowserFile()

@@ -18,26 +18,33 @@
                     <ValidationSummary class="text-danger" role="alert" />
                     <div class="row">
                         <div class="mb-3">
-                            <label for="totalhst" class="form-label">Vendor:</label>
-                            <InputText id="totalhst" @bind-Value="NewExpense.Vendor" class="form-control" />
+                            <InputText id="totalhst" @bind-Value="NewExpense.Vendor" class="form-control" placeholder="Enter the Vendor's name here..." />
                             <ValidationMessage For="() => NewExpense.Vendor" class="text-danger" />
                         </div>
                     </div>
                     <div class="row">
-                        <div class="mb-1 col-md-6">
-                            <label for="totalamount" class="form-label">Total Amount:</label>
+                        <div class="mb-1 col-md-2 d-flex align-items-center text-end">
+                            <b>Total Amount</b>
+                        </div>
+                        <div class="mb-1 col-md-4">
                             <InputNumber id="totalamount" @bind-Value="NewExpense.TotalAmount" class="form-control" />
                             <ValidationMessage For="() => NewExpense.TotalAmount" class="text-danger" />
                         </div>
-                        <div class="mb-1 col-md-6">
-                            <label for="totalhst" class="form-label">Total HST:</label>
+                        <div class="mb-1 col-md-2 d-flex align-items-center text-end">
+                            <b>Total HST</b>
+                        </div>
+                        <div class="mb-1 col-md-4">
+
                             <InputNumber id="totalhst" @bind-Value="NewExpense.TotalHst" class="form-control" />
                             <ValidationMessage For="() => NewExpense.TotalHst" class="text-danger" />
                         </div>
                     </div>
                     <div class="row">
-                        <div class="mb-1 col-md-6">
-                            <label for="department" class="form-label">Department</label>
+                        <div class="mb-1 col-md-2 d-flex align-items-center text-end">
+                            <b>Department</b>
+                        </div>
+                        <div class="mb-1 col-md-4">
+
                             <InputSelect @bind-Value="NewExpenseDetail.DepartmentId" class="form-select">
                                 @foreach (var department in _departments)
                                 {
@@ -45,8 +52,11 @@
                                 }
                             </InputSelect>
                         </div>
-                        <div class="mb-1 col-md-6">
-                            <label for="accounts" class="form-label">GL Account</label>
+                        <div class="mb-1 col-md-2 d-flex align-items-center text-end">
+                            <b>GL Account</b>
+                        </div>
+                        <div class="mb-1 col-md-4">
+
                             <InputSelect @bind-Value="NewExpenseDetail.AccountId" class="form-select">
                                 @foreach (var account in _glaccounts)
                                 {
@@ -56,31 +66,10 @@
                         </div>
                     </div>
 
-                    <div>
-                        <h5>Select Invoice Image</h5>
-                        <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
-                            <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
-                                <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
-                                <span style="display: block; width: 100%; height: 100%;margin-top:8px">
-                                    @if (BrowserFile != null)
-                                    {
-                                        <div>
-                                            <b>Selected File: </b>@BrowserFile.Name<br />
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div>Tap here to select a file</div>
-                                    }
-                                </span>
-                            </div>
-                        </label>
-                    </div>
-                    <div>
-                        <h5>Select Approver</h5>
+                    <div style="padding-top:3px">
                         <p>
                             <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control" style="appearance: auto;-webkit-appearance: auto;-moz-appearance: auto;">
-                                <option value="0">-- Select an Employee --</option>
+                                <option value="0">-- Select an Approver --</option>
                                 @foreach (var employee in filteredEmployees)
                                 {
                                     <option value="@employee.Id">@employee.FullName</option>
@@ -88,19 +77,45 @@
                             </InputSelect>
                         </p>
                     </div>
+
                     <div>
-                        <h5>Note</h5>
-                        <InputTextArea id="noteText" @bind-Value="NoteText" class="form-control" rows="2" />
+                        <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
+                            <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
+                                <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
+                                <span style="display: block; width: 100%; height: 100%;margin-top:8px">
+                                    @if (BrowserFile != null)
+                                    {
+                                        <div>
+                                            <b>Selected Image: </b>@BrowserFile.Name<br />
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div>Tap here to select a invoice image to attach.</div>
+                                    }
+                                </span>
+                            </div>
+                        </label>
+                    </div>
+
+                    <div>
+                        <InputTextArea id="noteText" @bind-Value="NoteText" class="form-control" rows="2" placeholder="If you have a note, enter it here..." />
                     </div>
                     <hr />
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
-                    <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save</button>
+                    <div style="text-align:right">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Cancel">Cancel</button>
+                        <button type="submit" data-bs-dismiss="modal" class="btn btn-primary">Save and Submit</button>
+                    </div>
                 </EditForm>
             </div>
             @*         <InputTextArea id="noteText" @bind-Value="newNote.NoteText" class="form-control" rows="7" /> *@
             @*         <ValidationMessage For="() => newNote.NoteText" class="text-danger" /> *@
             <div class="modal-footer">
-                <p>For more complex expenses, choose <u>Submit and Edit</u>. In the Expense Details you can add multiple approvers, split the expense between multiple accounts, and more.</p>
+
+                <p style="font-size:small">
+                    To send directly to the approver, select <u>Save and Submit</u>.<br />
+                    For more complex expenses, choose <u>Save and Edit</u>.In the <u>Expense Details</u> you can add multiple approvers, split the expense between multiple accounts, and more.
+                </p>
             </div>
         </div>
     </div>

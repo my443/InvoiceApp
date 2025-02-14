@@ -100,14 +100,14 @@ else
             <div class="col-md-4">
                 <div class="mb-3">
                     <b>Total HST</b><br />
-                    @Expense.TotalHst
+                    @Expense.TotalHst.ToString("N2")
                 </div>
             </div>
             <div class="col-md-4">
                 <input type="hidden" name="Expense.Id" value="@Expense.Id" />
                 <div class="mb-3">
                     <b>Total Amount</b><br />
-                    @Expense.TotalAmount
+                    @Expense.TotalAmount.ToString("N2")
                 </div>
             </div>
         </div>
@@ -178,8 +178,12 @@ else
         {
             <PropertyColumn Property="expensedetail => expensedetail.Department.Name" Title="Department" />
             <PropertyColumn Property="expensedetail => expensedetail.Account.Name" Title="Account" />
-            <PropertyColumn Property="expensedetail => expensedetail.Hst" />
-            <PropertyColumn Property="expensedetail => expensedetail.Amount" />
+            <TemplateColumn Title="Amount" Context="expensedetail">
+                @expensedetail.Amount.ToString("N2")
+            </TemplateColumn>
+            <TemplateColumn Title="HST" Context="expensedetail">
+                @expensedetail.Hst.ToString("N2")
+            </TemplateColumn>
         }
     </QuickGrid>
 

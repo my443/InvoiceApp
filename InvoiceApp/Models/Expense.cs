@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.CodeAnalysis.CodeActions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.SymbolStore;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,7 @@ namespace InvoiceApp.Models
     public class Expense
     {
         public int Id { get; set; }
+
         [Precision(18, 2)]
         public decimal TotalAmount { get; set; }
 

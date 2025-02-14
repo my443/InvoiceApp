@@ -2,7 +2,9 @@
 using InvoiceApp.Models;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
+using InvoiceApp.Validators;
+
 
 namespace InvoiceApp.Components.Pages.Shared
 {
@@ -14,6 +16,7 @@ namespace InvoiceApp.Components.Pages.Shared
         private bool uploadSuccess = false;
         private bool uploadError = false;
         private InputFile inputFileElement;
+
         IBrowserFile BrowserFile;
 
         // For Approvers
@@ -26,11 +29,14 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private List<Department> _departments;
         private List<GLAccount> _glaccounts;
-        private ExpenseDetail NewExpenseDetail = new ExpenseDetail { AccountId = -1, DepartmentId = -1 };
+        private ExpenseDetail NewExpenseDetail;
 
-        private void CloseModal()
+        private QuickAddValidator validator = new QuickAddValidator();
+
+        private async Task CloseModal()
         {
             OnClose.InvokeAsync();
+            await JSRuntime.InvokeVoidAsync("eval", "bootstrap.Modal.getInstance(document.getElementById('addExpenseModal')).hide()");
         }
 
         private ApplicationDbContext context = default!;
@@ -45,14 +51,22 @@ namespace InvoiceApp.Components.Pages.Shared
             filteredEmployees = context.Employees.ToList();
             _departments = context.Departments.ToList();
             _glaccounts = context.GLAccounts.ToList();
+            ResetExpenseDetail();
         }
 
         private async Task AddNewExpense()
         {
+            validator.ClearErrors();
+            bool isValid = validator.Validate(NewExpense, BrowserFile?.Name);
+
+            if (!isValid)
+            {
+                return;
+            }
+
             context.Expenses.Add(NewExpense);
             await context.SaveChangesAsync();
             int newExpenseId = NewExpense.Id;
-
 
             if (BrowserFile != null)
             {
@@ -66,6 +80,8 @@ namespace InvoiceApp.Components.Pages.Shared
 
             CloseModal();
             Cancel();           // Reset all variables.
+
+
         }
 
         private void GenerateNewExpense()
@@ -92,9 +108,11 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private void Cancel()
         {
+            validator.ClearErrors();
             GenerateNewExpense();
             GenerateNewBrowserFile();
             ResetSelectedApprover();
+            ResetExpenseDetail();
         }
 
         // File Upload Section
@@ -166,7 +184,7 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private void GenerateNote(int newExpenseId)
         {
-            if(!string.IsNullOrEmpty(NoteText))
+            if (!string.IsNullOrEmpty(NoteText))
             {
                 Note newNote = new Note();
                 newNote.ExpenseId = newExpenseId;
@@ -180,13 +198,19 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private void GenerateExpenseDetail(int NewExpenseId)
         {
+            //NewExpenseDetail = new ExpenseDetail();
             Expense expense = context.Expenses.Where(e => e.Id == NewExpenseId).FirstOrDefault();
             NewExpenseDetail.ExpenseId = NewExpenseId;
-            NewExpenseDetail.Amount = expense.TotalAmount;            
+            NewExpenseDetail.Amount = expense.TotalAmount;
             NewExpenseDetail.Hst = expense.TotalHst;
 
             context.Add(NewExpenseDetail);
             context.SaveChanges();
+        }
+
+        private void ResetExpenseDetail()
+        {
+            NewExpenseDetail = new ExpenseDetail { AccountId = -1, DepartmentId = -1 };
         }
     }
 }

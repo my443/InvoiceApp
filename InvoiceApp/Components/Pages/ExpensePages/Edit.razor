@@ -37,11 +37,11 @@
                         <li><a class="dropdown-item" href="" @onclick="()=> SubmitExpense()">Submit Expense</a></li>
                     </ul>
                 </div>
-            }        
+            }
+        </div>
     </div>
 </div>
-</div>
-<p>@(IsEditing ? "Editing" : "Locked")</p>
+@* <p>@(IsEditing ? "Editing" : "Locked")</p> *@
 <div class="row">
     <div class="col-12">
         <div style="background-color: rgb(5, 39, 103); color:white;border-radius: 8px;padding: 5px;padding-left: 15px;">
@@ -212,59 +212,66 @@ else
 {
     @if (IsEditing)
     {
-        <button class="btn btn-success" @onclick="AddApproval">Add Approval</button>
+        <div class="row" style="margin-top:5px;">
+            <div class="col-md-9 mb-3">
+                @* <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" /> *@
 
-        <InputText id="employeeSearch" @bind-Value="employeeSearchTerm" @oninput="FilterEmployees" class="form-control" />
-
-        <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-control">
-            <option value="">-- Select an Employee --</option>
-            @foreach (var employee in filteredEmployees)
-            {
-                <option value="@employee.Id">@employee.FullName</option>
-            }
-        </InputSelect>
+                <InputSelect id="employeeSelect" @bind-Value="selectedEmployeeId" class="form-select">
+                    <option value="-1">-- Select an Approver --</option>
+                    @foreach (var employee in filteredEmployees)
+                    {
+                        <option value="@employee.Id">@employee.FullName</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-3 mb-3 d-flex justify-content-end">
+                <button class="btn btn-success w-100" style="margin-right: 1.1rem;" @onclick="AddApproval">Add Approver</button>
+            </div>
+        </div>
     }
 
     <QuickGrid Class="table" Items="context.Approvals.Where(a => a.ExpenseId == Expense.Id)">
         <PropertyColumn Property="approval => approval.Approver.FullName" Title="Approver's Name'" />
-        @* <PropertyColumn Property="approval => approval.LastUpdated" /> *@
-        @* <PropertyColumn Property="approval => approval.IsApproved" /> *@
-        <TemplateColumn Context="approval" Title="Approval Status">
-            @if (approval.IsApproved)
-            {
-                <span class="text-success"><b>Approved</b></span>
-            }
-            else
-            {
-                <span class="text-danger"><b>Not Approved</b></span>
-            }
 
+        <TemplateColumn Context="approval" Title="Approval Status">
+                @if (approval.IsApproved)
+                {
+                    <span class="text-success"><b>Approved</b></span>
+                }
+                else
+                {
+                    <span class="text-danger"><b>Not Approved</b></span>
+                }
         </TemplateColumn>
         @if (IsEditing)
         {
             <TemplateColumn Context="approval">
-                @* <a href="@($"approvals/edit?id={approval.Id}")">Edit</a> | *@
-                @* <a href="@($"approvals/details?id={approval.Id}")">Details</a> | *@
-                @* <a href="@($"approvals/delete?id={approval.Id}")">Delete</a> *@
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteApprovalModal" @onclick='() => DeleteApprover(approval.Id)'>
-                    Delete Approver
-                </button>
+                <div class="text-end">
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteApprovalModal" @onclick='() => DeleteApprover(approval.Id)'>
+                        Delete Approver
+                    </button>
+                </div>
             </TemplateColumn>
         }
 
-        <TemplateColumn Context="approval">
-            @if (!IsEditing && !approval.IsApproved)
-            {
-                <button type="button" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
-                    Approve
-                </button>
-            }
-            @if (!IsEditing && !approval.IsApproved)
-            {
-                <button class="btn btn-success" @onclick="ReturnToSubmitter">Return to Requestor</button>
+        @if (!IsEditing)
+        {
+            <TemplateColumn Context="approval">
 
-            }
-        </TemplateColumn>
+                @if (!IsEditing && !approval.IsApproved)
+                {
+                    <button type="button" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
+                        Approve
+                    </button>
+                }
+                @if (!IsEditing && !approval.IsApproved)
+                {
+                    <button class="btn btn-success" @onclick="ReturnToSubmitter">Return to Requestor</button>
+
+                }
+
+            </TemplateColumn>
+        }
 
 
 

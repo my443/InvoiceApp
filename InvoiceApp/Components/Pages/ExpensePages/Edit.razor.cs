@@ -25,7 +25,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
 
         private string employeeSearchTerm = string.Empty;
-        private int selectedEmployeeId;
+        private int selectedEmployeeId = -1;
         private List<Employee> employees = new List<Employee>();
         private List<Employee> filteredEmployees = new List<Employee>();
 

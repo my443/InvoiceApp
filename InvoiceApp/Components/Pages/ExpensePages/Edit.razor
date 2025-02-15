@@ -17,29 +17,33 @@
 <hr />
 
 <div class="row">
-    <div class="col-4">
+    <div class="col-md-3 mb-3">
         <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
     </div>
-    <div class="col-8 ms-auto">
+    <div class="col-md-6 mb-3">
         <div class="text-end">
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>
             <button @onclick='() => ToggleSection("AllSections")' class="btn btn-primary">@(sectionVisibility["AllSections"] ? "Show All Sections" : "Hide All Sections")</button>
-            @if (IsEditing)
-            {
-                <div class="dropdown d-inline-block" style="margin-left:5px;">
-                    <button class="btn btn-success dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                        Save Actions
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="/expenses/edit?id=@Expense.Id" @onclick="SaveAndRefreshPage">Save Details</a></li>
-                        <li><a class="dropdown-item" href="" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
-                        <li><a class="dropdown-item" href="" @onclick="()=> SubmitExpense()">Submit Expense</a></li>
-                    </ul>
-                </div>
-            }
+
         </div>
     </div>
+    <div class="col-md-3 mb-3 d-flex justify-content-end">
+        @if (IsEditing)
+        {
+            <div class="dropdown d-inline-block w-100" style="margin-right:1.1em;">
+                <button class="btn btn-success dropdown-toggle w-100" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right:1.1em;">
+                    Save Actions
+                </button>
+                <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton1" style="margin-right:1.1em;">
+                    <li><a class="dropdown-item" href="/expenses/edit?id=@Expense.Id" @onclick="SaveAndRefreshPage">Save Details</a></li>
+                    <li><a class="dropdown-item" href="" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
+                    <li><a class="dropdown-item" href="" @onclick="()=> SubmitExpense()">Submit Expense</a></li>
+                </ul>
+            </div>
+        }
+    </div>
+
 </div>
 @* <p>@(IsEditing ? "Editing" : "Locked")</p> *@
 <div class="row">
@@ -134,7 +138,13 @@ else
 {
     @if (IsEditing)
     {
-        <button class="btn btn-success" @onclick="AddExpenseDetail">Add Expense Detail</button>
+        <div class="row" style="margin-top:5px;">
+            <div class="col-md-9"></div>
+            <div class="col-md-3 mb-3 d-flex justify-content-end">
+                <button class="btn btn-success w-100" style="margin-right: 1.1rem;" @onclick="AddExpenseDetail">Add Expense Detail</button>
+            </div>
+        </div>
+
     }
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
         @if (IsEditing)
@@ -155,27 +165,19 @@ else
                     }
                 </InputSelect>
             </TemplateColumn>
-            @* <PropertyColumn Property="expensedetail => expensedetail.Department.Name" /> *@
-            @* <PropertyColumn Property="expensedetail => expensedetail.Account.Name" /> *@
             <TemplateColumn Title="HST" Context="expensedetail">
-                <InputNumber @bind-Value="expensedetail.Hst" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+                <InputNumber @bind-Value="expensedetail.Hst" class="form-control" @onchange="() => OnDepartmentChanged(expensedetail)">
                 </InputNumber>
             </TemplateColumn>
             <TemplateColumn Title="Amount" Context="expensedetail">
-                <InputNumber @bind-Value="expensedetail.Amount" class="form-select" @onchange="() => OnDepartmentChanged(expensedetail)">
+                <InputNumber @bind-Value="expensedetail.Amount" class="form-control" @onchange="() => OnDepartmentChanged(expensedetail)">
                 </InputNumber>
             </TemplateColumn>
-
-
-            @* <PropertyColumn Property="expensedetail => expensedetail.ExpenseId" /> *@
-
-
             <TemplateColumn Context="expensedetail">
-                <button class="btn btn-primary" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
-                @* <a href="@($"expensedetails/edit?id={expensedetail.Id}")">Edit</a> | *@
-                @* <a href="@($"expensedetails/details?id={expensedetail.Id}")">Details</a> | *@
-                <button class="btn btn-danger" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
-                @* <a href="@($"expensedetails/delete?id={expensedetail.Id}")">Delete</a> *@
+                <div style="text-align:right;white-space: nowrap;">
+                    <button class="btn btn-primary" style="white-space: nowrap;margin-right:5px" @onclick="() => OnDepartmentChanged(expensedetail)">Save Change</button>
+                    <button class="btn btn-danger" style="white-space: nowrap" @onclick="() => DeleteDetailRow(expensedetail)">Delete Row</button>
+                </div>
             </TemplateColumn>
         }
         else
@@ -234,14 +236,14 @@ else
         <PropertyColumn Property="approval => approval.Approver.FullName" Title="Approver's Name'" />
 
         <TemplateColumn Context="approval" Title="Approval Status">
-                @if (approval.IsApproved)
-                {
-                    <span class="text-success"><b>Approved</b></span>
-                }
-                else
-                {
-                    <span class="text-danger"><b>Not Approved</b></span>
-                }
+            @if (approval.IsApproved)
+            {
+                <span class="text-success"><b>Approved</b></span>
+            }
+            else
+            {
+                <span class="text-danger"><b>Not Approved</b></span>
+            }
         </TemplateColumn>
         @if (IsEditing)
         {
@@ -257,18 +259,19 @@ else
         @if (!IsEditing)
         {
             <TemplateColumn Context="approval">
+                <div class="text-end">
+                    @if (!IsEditing && !approval.IsApproved)
+                    {
+                        <button type="button" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
+                            Approve
+                        </button>
+                    }
+                    @if (!IsEditing && !approval.IsApproved)
+                    {
+                        <button class="btn btn-success" @onclick="ReturnToSubmitter">Return to Requestor</button>
 
-                @if (!IsEditing && !approval.IsApproved)
-                {
-                    <button type="button" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
-                        Approve
-                    </button>
-                }
-                @if (!IsEditing && !approval.IsApproved)
-                {
-                    <button class="btn btn-success" @onclick="ReturnToSubmitter">Return to Requestor</button>
-
-                }
+                    }
+                </div>
 
             </TemplateColumn>
         }

@@ -64,6 +64,12 @@ else
 {
     @if (IsEditing)
     {
+        <div class="row" style="margin-top:5px;">
+            <div class="col-md-9"></div>
+            <div class="col-md-3 mb-3 d-flex justify-content-end">
+                <button class="btn btn-success w-100" style="margin-right: 1.1rem;" @onclick="SaveAndRefreshPage">Save Updated Expense</button>
+            </div>
+        </div>
         <div class="row">
             <EditForm method="post" Model="Expense" OnValidSubmit="UpdateExpense" FormName="edit" Enhance>
                 <DataAnnotationsValidator />
@@ -71,14 +77,14 @@ else
                 <div class="row">
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="totalhst" class="form-label">Vendor Name</label>
+                            <label for="totalhst" class="form-label"><b>Vendor Name</b></label>
                             <InputText id="vendor" @bind-Value="Expense.Vendor" class="form-control" />
                             <ValidationMessage For="() => Expense.Vendor" class="text-danger" />
                         </div>
                     </div>
                     <div class="col-md-4">
                         <div class="mb-3">
-                            <label for="totalhst" class="form-label">Total Hst</label>
+                            <label for="totalhst" class="form-label"><b>Total Hst</b></label>
                             <InputNumber id="totalhst" @bind-Value="Expense.TotalHst" class="form-control" />
                             <ValidationMessage For="() => Expense.TotalHst" class="text-danger" />
                         </div>
@@ -86,7 +92,7 @@ else
                     <div class="col-md-4">
                         <input type="hidden" name="Expense.Id" value="@Expense.Id" />
                         <div class="mb-3">
-                            <label for="totalamount" class="form-label">Total Amount</label>
+                            <label for="totalamount" class="form-label"><b>Total Amount</b></label>
                             <InputNumber id="totalamount" @bind-Value="Expense.TotalAmount" class="form-control" />
                             <ValidationMessage For="() => Expense.TotalAmount" class="text-danger" />
                         </div>
@@ -144,7 +150,6 @@ else
                 <button class="btn btn-success w-100" style="margin-right: 1.1rem;" @onclick="AddExpenseDetail">Add Expense Detail</button>
             </div>
         </div>
-
     }
     <QuickGrid Class="table" Items="context.ExpenseDetails.Where(expensedetails => expensedetails.ExpenseId == Expense.Id).Include(ed => ed.Department).Include(ed => ed.Account)">
         @if (IsEditing)
@@ -297,6 +302,12 @@ else
 
 @if (sectionVisibility["Notes"])
 {
+    <div class="row" style="margin-top:5px;">
+        <div class="col-md-9"></div>
+        <div class="col-md-3 mb-3 d-flex justify-content-end">
+            <button type="button" class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#addNoteModal" style="margin-right: 1.1rem;">Add Note</button>
+        </div>
+    </div>
     <QuickGrid Class="table" Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)">
         <TemplateColumn Title="Note Text" Class="w-50">
             <div style="width: 100%;">
@@ -304,15 +315,7 @@ else
             </div>
         </TemplateColumn>
         <PropertyColumn Property="note => note.WrittenBy.FullName" />
-        @* <PropertyColumn Property="note => note.WrittenBy.EmailAddress" /> *@
         <PropertyColumn Property="note => note.DateAdded" />
-        @* <PropertyColumn Property="note => note.ExpenseId" /> *@
-
-        @* <TemplateColumn Context="note"> *@
-        @*     <a href="@($"notes/edit?id={note.Id}")">Edit</a> | *@
-        @*     <a href="@($"notes/details?id={note.Id}")">Details</a> | *@
-        @*     <a href="@($"notes/delete?id={note.Id}")">Delete</a> *@
-        @* </TemplateColumn> *@
     </QuickGrid>
 
     <NotesGrid Items="context.Notes.Where(n => n.ExpenseId == Expense.Id)" />

@@ -1,4 +1,5 @@
 ﻿using InvoiceApp.Models;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace InvoiceApp.Validators
 {
@@ -13,7 +14,7 @@ namespace InvoiceApp.Validators
             ErrorMessages = new List<string>();
         }
 
-        public bool Validate(Expense NewExpense, string AttachmentName)
+        public bool Validate(Expense NewExpense, IBrowserFile BrowserFile)
         {
             bool isValid = true;
 
@@ -27,9 +28,14 @@ namespace InvoiceApp.Validators
                 ErrorMessages.Add("Enter a vendor name, or \"Unknown\"");
                 isValid = false;
             }
-            if (AttachmentName == null || AttachmentName == "")
+            if (BrowserFile.Name == null || BrowserFile.Name == "")
             {
                 ErrorMessages.Add("Select an image or document to be uploaded.");
+                isValid = false;
+            }
+            if (BrowserFile.Size > 20971520)
+            {
+                ErrorMessages.Add("File size must be less than 20MB");
                 isValid = false;
             }
 

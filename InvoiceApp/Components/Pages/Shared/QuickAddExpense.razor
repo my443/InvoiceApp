@@ -94,7 +94,7 @@
                     <div>
                         <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer">
                             <div class="mb-3 btn btn-primary w-100 " style="height:50px;background-color:orange;color:black;">
-                                <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" />
+                                <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" @ref="inputFileElement" style="display: none;" MaxAllowedSize="104857600" />
                                 <span style="display: block; width: 100%; height: 100%;margin-top:8px">
                                     @if (BrowserFile != null)
                                     {

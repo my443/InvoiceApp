@@ -33,6 +33,8 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private QuickAddValidator validator = new QuickAddValidator();
 
+        int MaxFileSize = 20971520; // 20MB
+
         private async Task CloseModal()
         {
             OnClose.InvokeAsync();
@@ -57,7 +59,7 @@ namespace InvoiceApp.Components.Pages.Shared
         private async Task AddNewExpense()
         {
             validator.ClearErrors();
-            bool isValid = validator.Validate(NewExpense, BrowserFile?.Name);
+            bool isValid = validator.Validate(NewExpense, BrowserFile);
 
             if (!isValid)
             {
@@ -118,7 +120,7 @@ namespace InvoiceApp.Components.Pages.Shared
         // File Upload Section
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
-            BrowserFile = e.File;
+            BrowserFile = e.File;            
         }
 
         private int SaveFilenameRecordToDatabase(IBrowserFile file)
@@ -166,7 +168,7 @@ namespace InvoiceApp.Components.Pages.Shared
             var filePath = Path.Combine(uploadsFolder, filename);
 
             await using var fileStream = new FileStream(filePath, FileMode.Create);
-            await file.OpenReadStream().CopyToAsync(fileStream);
+            await file.OpenReadStream(maxAllowedSize: MaxFileSize).CopyToAsync(fileStream);     // Change the maxAllowedSize here.
         }
 
         private void GenerateApproval(int newExpenseId)

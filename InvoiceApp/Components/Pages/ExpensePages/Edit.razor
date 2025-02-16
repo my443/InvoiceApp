@@ -338,10 +338,18 @@ else
 {
     @if (IsEditing)
     {
-        <!-- File Upload -->
-        <div class="mb-3">
-            <label for="fileUpload" class="form-label">Upload Attachment:</label>
-            <InputFile id="fileUpload" OnChange="HandleFileSelected" />
+        <div class="row" style="margin-top:5px;">
+            <div class="col-md-9"></div>
+            <div class="col-md-3 mb-3 d-flex justify-content-end" >
+                <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer;margin-right: 1.1rem">
+                    <div class="mb-3 btn btn-success w-100 ">
+                        <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" style="display: none;" MaxAllowedSize="104857600" />
+                        <span style="display: block; width: 100%; height: 100%;">
+                            <div>Attach Document or Image</div>
+                        </span>
+                    </div>
+                </label>
+            </div>
         </div>
     }
     @if (_images.Any())

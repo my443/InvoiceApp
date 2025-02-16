@@ -462,7 +462,7 @@ else
     </div>
 </div>
 
-<!--Inform that there ar eno approvers-->
+<!--Inform that there are no approvers-->
 <div class="modal fade" id="noApproversModal" tabindex="-1" aria-labelledby="noApproversModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -493,3 +493,26 @@ else
     </div>
 </div>
 
+
+<!-- File to large -->
+@if(FileToLarge)
+{
+
+    <div class="modal show d-block" id="fileToLargeModal" tabindex="-1" aria-labelledby="fileToLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-danger" id="fileToLargeModalLabel">File Is Too Big</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>We can't upload your file, it is bigger than 20MB. <br />Please shrink the file so that it can be uploaded. </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="FileToLargeClose">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="modal-backdrop fade show"></div>
+}

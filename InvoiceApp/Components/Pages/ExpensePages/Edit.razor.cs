@@ -42,6 +42,9 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
         public bool IsEditing { get; set; }
 
+        private bool FileToLarge;
+        private int MaxFileSize = 20971520;  // 20MB
+
         private bool UserCanApprove { get; set; }
         private bool UserCanProcess { get; set; }
 
@@ -51,6 +54,8 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         public double TotalAmount { get; set; }
         [Precision(18, 2)]
         public double TotalHst { get; set; }
+
+
         public IQueryable<ExpenseDetail> ExpenseDetails { get; set; } = new List<ExpenseDetail>().AsQueryable();
 
         public Dictionary<string, bool> sectionVisibility = new Dictionary<string, bool>
@@ -64,6 +69,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
                 { "DeleteApproverModal", false },
                 { "AllSections", false },
             };
+
 
         protected override async Task OnInitializedAsync()
         {
@@ -223,6 +229,12 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         {
             IBrowserFile file = e.File;
 
+            if (file.Size > 20971520) 
+            {
+                FileToLarge = true;
+                return;
+            }
+
             // Save to Database. Get Filename
             int imageDbID = SaveFilenameRecordToDatabase(file);
             string filename = $"{imageDbID.ToString()}-{file.Name}";
@@ -232,7 +244,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             var filePath = Path.Combine(uploadsFolder, filename);
 
             await using var fileStream = new FileStream(filePath, FileMode.Create);
-            await file.OpenReadStream().CopyToAsync(fileStream);
+            await file.OpenReadStream(maxAllowedSize: MaxFileSize).CopyToAsync(fileStream);
         }
 
         private int SaveFilenameRecordToDatabase(IBrowserFile file)
@@ -268,6 +280,9 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             }
 
             return fileType;
+        }
+        private void FileToLargeClose() {
+            FileToLarge = false;
         }
 
         private async Task DownloadFile(int imageId)

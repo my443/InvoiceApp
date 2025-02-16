@@ -14,9 +14,10 @@
 <PageTitle>Edit</PageTitle>
 
 <h2>Expense Details </h2>
-<hr />
 
-<div class="row">
+
+<div class="row sticky-top bg-white">
+    <hr />
     <div class="col-md-3 mb-3">
         <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
     </div>
@@ -37,13 +38,14 @@
                 </button>
                 <ul class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton1" style="margin-right:1.1em;">
                     <li><a class="dropdown-item" href="/expenses/edit?id=@Expense.Id" @onclick="SaveAndRefreshPage">Save Details</a></li>
-                    <li><a class="dropdown-item" href="" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
                     <li><a class="dropdown-item" href="" @onclick="()=> SubmitExpense()">Submit Expense</a></li>
+                    <li><a class="dropdown-item" href="" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
+                    <li><a class="dropdown-item" href="/expenses">Go Back to Expense List (Don't Save)</a></li>
                 </ul>
             </div>
         }
     </div>
-
+    <hr />
 </div>
 @* <p>@(IsEditing ? "Editing" : "Locked")</p> *@
 <div class="row">
@@ -340,7 +342,7 @@ else
     {
         <div class="row" style="margin-top:5px;">
             <div class="col-md-9"></div>
-            <div class="col-md-3 mb-3 d-flex justify-content-end" >
+            <div class="col-md-3 mb-3 d-flex justify-content-end">
                 <label for="fileInput" style="width: 100%; height: 100%; display: block; cursor: pointer;margin-right: 1.1rem">
                     <div class="mb-3 btn btn-success w-100 ">
                         <InputFile id="fileInput" class="btn btn-primary" OnChange="HandleFileSelected" style="display: none;" MaxAllowedSize="104857600" />
@@ -387,7 +389,7 @@ else
 
 
 
-<a href="/expenses">Back to List</a>
+
 
 
 <!-- Button to trigger modal -->

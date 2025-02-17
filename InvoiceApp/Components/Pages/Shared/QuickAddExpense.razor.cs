@@ -105,6 +105,13 @@ namespace InvoiceApp.Components.Pages.Shared
 
         private void SaveAndEdit()
         {
+            validator.ClearErrors();
+            bool isValid = validator.Validate(NewExpense, BrowserFile);
+
+            if (!isValid)
+            {
+                return;
+            }
             NewExpense.ExpenseStatus = context.ExpenseStatus.Where(e => e.Id == 1).FirstOrDefault();    // Set to 'Editing Mode'
             AddNewExpense();
             CloseModal();

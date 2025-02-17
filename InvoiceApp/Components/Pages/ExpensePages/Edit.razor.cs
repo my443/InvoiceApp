@@ -108,7 +108,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
         private void SetEditingMode()
         {
-            if (Expense.ExpenseStatus.Id == 1) // 1 is "Created"
+            if (Expense.ExpenseStatus.Id == 1 || Expense.ExpenseStatus.Id == 3) // 1 is "Created", 3 is "Confirmed For Processing"
             {
                 IsEditing = true;
             }
@@ -323,10 +323,6 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         {
             UpdateExpense();
 
-            if (AllItemsAreApproved()) { 
-                MoveToAccountsPayableProcessing(); 
-            }
-
             NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
         }
 
@@ -440,11 +436,18 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private async Task Approve(int approvalId)
         {
             var approval = await context.Approvals.FindAsync(approvalId);
+
             if (approval != null)
             {
                 approval.IsApproved = true;
                 await context.SaveChangesAsync();
             }
+
+            if (AllItemsAreApproved())
+            {
+                MoveToAccountsPayableProcessing();
+            }
+
             RefreshApprovalList();
         }
 
@@ -618,6 +621,12 @@ namespace InvoiceApp.Components.Pages.ExpensePages
                     sectionVisibility[section] = true;
                 }
             }
+        }
+
+        private async Task ApproveForPament() {
+            Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 4);         // 4 is "Approved For Payment"
+            await context.SaveChangesAsync();
+            SaveAndRefreshPage();   
         }
     }
 }

@@ -67,6 +67,8 @@ namespace InvoiceApp.Components.Pages.Shared
                 return;
             }
 
+            NewExpense = SelectStatus(NewExpense);
+
             context.Expenses.Add(NewExpense);
             await context.SaveChangesAsync();
             int newExpenseId = NewExpense.Id;
@@ -87,8 +89,22 @@ namespace InvoiceApp.Components.Pages.Shared
 
         }
 
-        private void SaveAndEdit() 
-        {            
+        // Sets the status to A/P Processing if there are no approvers. 
+        private Expense SelectStatus(Expense newExpense)
+        {
+            if (newExpense.ExpenseStatus.Id == 2)
+            {
+                if (!context.Approvals.Any(a => a.ExpenseId == NewExpense.Id))
+                {
+                    newExpense.ExpenseStatus = context.ExpenseStatus.Where(e => e.Id == 3).FirstOrDefault();    // Set to 'Approved For Processing'
+                }
+            }
+
+            return newExpense;
+        }
+
+        private void SaveAndEdit()
+        {
             NewExpense.ExpenseStatus = context.ExpenseStatus.Where(e => e.Id == 1).FirstOrDefault();    // Set to 'Editing Mode'
             AddNewExpense();
             CloseModal();
@@ -129,7 +145,7 @@ namespace InvoiceApp.Components.Pages.Shared
         // File Upload Section
         private async Task HandleFileSelected(InputFileChangeEventArgs e)
         {
-            BrowserFile = e.File;            
+            BrowserFile = e.File;
         }
 
         private int SaveFilenameRecordToDatabase(IBrowserFile file)

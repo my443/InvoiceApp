@@ -521,8 +521,6 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             return context.Expenses.FirstOrDefault(e => e.Id == id);
         }
 
-
-
         // Delete an expense by ID
         public void DeleteExpense(int id)
         {

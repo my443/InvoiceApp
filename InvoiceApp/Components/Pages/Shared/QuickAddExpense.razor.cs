@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using InvoiceApp.Validators;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 namespace InvoiceApp.Components.Pages.Shared
@@ -83,10 +84,9 @@ namespace InvoiceApp.Components.Pages.Shared
             GenerateNote(newExpenseId);
             GenerateExpenseDetail(newExpenseId);
 
-            CloseModal();
-            Cancel();           // Reset all variables.
-
-
+            //CloseModal();
+            //Cancel();           // Reset all variables.
+            NavigationManager.NavigateTo($"/expenses/edit?id={newExpenseId}");
         }
 
         // Sets the status to A/P Processing if there are no approvers. 

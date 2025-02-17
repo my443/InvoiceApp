@@ -23,7 +23,6 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         [SupplyParameterFromForm]
         private Expense? Expense { get; set; }
 
-
         private string employeeSearchTerm = string.Empty;
         private int selectedEmployeeId = -1;
         private List<Employee> employees = new List<Employee>();

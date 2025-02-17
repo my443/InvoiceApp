@@ -13,16 +13,29 @@
 
 <PageTitle>Edit</PageTitle>
 
-<h2>Expense Details </h2>
+<h4>Expense Details </h4>
 
 
 <div class="row sticky-top bg-white">
     <hr />
-    <div class="col-md-3 mb-3">
-        <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
+    <div class="col-md-6 mb-3">
+        <table>
+            <tr>
+                <td class="w-25 @(Expense.ExpenseStatus.Id == 1 ? "bg-success" : "")" style="border-right: 1px solid #000;"><i class="bi bi-1-square-fill"></i></td>
+                <td class="w-25 @(Expense.ExpenseStatus.Id == 2 ? "bg-success" : "")" style="border-right: 1px solid #000;padding-left:7px"><i class="bi bi-2-square-fill"></i></td>
+                <td class="w-25 @(Expense.ExpenseStatus.Id == 3 ? "bg-success" : "")" style="border-right: 1px solid #000;padding-left:7px"><i class="bi bi-3-square-fill"></i></td>
+                <td class="w-25 @(Expense.ExpenseStatus.Id == 4 ? "bg-success" : "")" style="padding-left:7px"><i class="bi bi-4-square-fill"></i></td>
+            </tr>
+            <tr class="small">
+                <td class="@(Expense.ExpenseStatus.Id == 1 ? "bg-success" : "")" style="border-right: 1px solid #000;">Creating Stage</td>
+                <td class="@(Expense.ExpenseStatus.Id == 2 ? "bg-success" : "")" style="border-right: 1px solid #000;padding-left:7px">Approval Stage</td>
+                <td class="@(Expense.ExpenseStatus.Id == 3 ? "bg-success" : "")" style="border-right: 1px solid #000;padding-left:7px">Processing Stage</td>
+                <td class="@(Expense.ExpenseStatus.Id == 4 ? "bg-success" : "")" style="padding-left:7px;">Completed for Payment</td>
+            </tr>
+        </table>
     </div>
 
-    <div class="col-md-@(IsEditing ? "6" : "9" ) mb-3">
+    <div class="col-md-@(IsEditing ? "3" : "6" ) mb-3">
         <div class="text-end">
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>

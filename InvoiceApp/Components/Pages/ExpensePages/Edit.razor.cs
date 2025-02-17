@@ -465,10 +465,12 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             if (!_approvals.Any())
             {
-                //await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#noApproversModal').classList.add('show')");
-                //await JSRuntime.InvokeVoidAsync("eval", "document.querySelector('#noApproversModal').style.display = 'block'");
-                var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#noApproversModal");
-                await modal.InvokeVoidAsync("hide");
+                // This is if you need to warn about the no approvers..
+                //var modal = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Modal.getInstance", "#noApproversModal");
+                //await modal.InvokeVoidAsync("hide");
+
+                Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 3);         // 3 is "Confirmed For Processing"
+                context.SaveChanges();
             }
         }
 

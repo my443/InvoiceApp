@@ -211,15 +211,16 @@ namespace InvoiceApp.Components.Pages.ExpensePages
 
             await context.SaveChangesAsync();
 
-            NavigationManager.NavigateTo("/expenses");
+            NavigateToExpenseDetail();
         }
 
         private async Task MoveToAccountsPayableProcessing()
         {
             Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 3);         // 1 is "Confirmed For Processing"
             await context.SaveChangesAsync();
-            SaveAndRefreshPage();
-            StateHasChanged();
+            //SaveAndRefreshPage();
+            //StateHasChanged();
+            NavigateToExpenseDetail();
         }
 
         private void FilterEmployees(ChangeEventArgs e)
@@ -322,9 +323,9 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private void SaveAndRefreshPage()
         {
             UpdateExpense();
-
+            NavigateToExpenseDetail();
             //NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
-            NavigationManager.NavigateTo($"/expenses/edit?id={Expense.Id}#top");
+            //NavigationManager.NavigateTo($"/expenses/edit?id={Expense.Id}#top");
         }
 
         private void SaveAndReturnToList()
@@ -449,8 +450,10 @@ namespace InvoiceApp.Components.Pages.ExpensePages
                 MoveToAccountsPayableProcessing();
             }
 
-            RefreshApprovalList();
-            SaveAndRefreshPage();
+            //RefreshApprovalList();
+            //SaveAndRefreshPage();
+
+            NavigateToExpenseDetail();
         }
 
         private bool AllItemsAreApproved()
@@ -472,6 +475,13 @@ namespace InvoiceApp.Components.Pages.ExpensePages
                 Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 3);         // 3 is "Confirmed For Processing"
                 context.SaveChanges();
             }
+
+            NavigateToExpenseDetail();
+        }
+
+        private void NavigateToExpenseDetail()
+        {
+            NavigationManager.NavigateTo($"/expenses/edit?id={Expense.Id}", forceLoad: true);
         }
 
         public bool ToggleIsEditing()
@@ -629,6 +639,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 4);         // 4 is "Approved For Payment"
             await context.SaveChangesAsync();
             SaveAndRefreshPage();   
+            NavigateToExpenseDetail();
         }
     }
 }

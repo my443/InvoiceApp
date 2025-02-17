@@ -112,6 +112,7 @@ namespace InvoiceApp.Components.Pages.Shared
             {
                 return;
             }
+
             NewExpense.ExpenseStatus = context.ExpenseStatus.Where(e => e.Id == 1).FirstOrDefault();    // Set to 'Editing Mode'
             AddNewExpense();
             CloseModal();

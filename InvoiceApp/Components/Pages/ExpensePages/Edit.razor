@@ -55,14 +55,14 @@
                     <li><a class="dropdown-item" href="/expenses/edit?id=@Expense.Id" @onclick="SaveAndRefreshPage">Save Details</a></li>
                     @if (Expense.ExpenseStatus.Id == 1)
                     {
-                        <li><b><a class="dropdown-item" href="" @onclick="()=> SubmitExpense()">Submit Expense</a></b></li>
+                        <li><b><a class="dropdown-item" @onclick="()=> SubmitExpense()">Submit Expense</a></b></li>
                     }
                     @if (Expense.ExpenseStatus.Id == 3)
                     {
-                        <li><a class="dropdown-item" href="" @onclick="()=> ApproveForPament()"><i class="text-danger">Approve for Payment</i></a></li>
-                        <li><a class="dropdown-item" href="" @onclick="()=> ReturnToSubmitter()"><i class="text-info">Return To Submitter</i></a></li>
+                        <li><a class="dropdown-item" @onclick="()=> ApproveForPament()"><i class="text-danger">Approve for Payment</i></a></li>
+                        <li><a class="dropdown-item" @onclick="()=> ReturnToSubmitter()"><i class="text-info">Return To Submitter</i></a></li>
                     }
-                    <li><a class="dropdown-item" href="" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
+                    <li><a class="dropdown-item" @onclick="SaveAndReturnToList">Save And Return To List</a></li>
                     <li><a class="dropdown-item" href="/expenses">Go Back to Expense List (Don't Save)</a></li>
                 </ul>
             </div>

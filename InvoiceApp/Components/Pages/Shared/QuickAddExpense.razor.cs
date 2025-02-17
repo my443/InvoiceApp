@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using InvoiceApp.Validators;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 
 namespace InvoiceApp.Components.Pages.Shared
@@ -86,11 +87,19 @@ namespace InvoiceApp.Components.Pages.Shared
 
         }
 
+        private void SaveAndEdit() 
+        {            
+            NewExpense.ExpenseStatus = context.ExpenseStatus.Where(e => e.Id == 1).FirstOrDefault();    // Set to 'Editing Mode'
+            AddNewExpense();
+            CloseModal();
+            Cancel();           // Reset all variables.
+        }
+
         private void GenerateNewExpense()
         {
             NewExpense = new Expense();
             NewExpense.IsDeleted = false;
-            ExpenseStatus status = context.ExpenseStatus.Where(e => e.Id == 2).FirstOrDefault();
+            ExpenseStatus status = context.ExpenseStatus.Where(e => e.Id == 2).FirstOrDefault();    // By Default it is set to 'Requires Approval'
             Employee employee = context.Employees.Where(e => e.Id == 2).FirstOrDefault();           // TODO - Must remove this hardcoded value
             NewExpense.IsDeleted = false;
             NewExpense.ExpenseStatus = status;

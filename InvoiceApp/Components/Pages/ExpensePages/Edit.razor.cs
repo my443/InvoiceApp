@@ -323,7 +323,8 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         {
             UpdateExpense();
 
-            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+            //NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+            NavigationManager.NavigateTo($"/expenses/edit?id={Expense.Id}#top");
         }
 
         private void SaveAndReturnToList()
@@ -449,6 +450,7 @@ namespace InvoiceApp.Components.Pages.ExpensePages
             }
 
             RefreshApprovalList();
+            SaveAndRefreshPage();
         }
 
         private bool AllItemsAreApproved()

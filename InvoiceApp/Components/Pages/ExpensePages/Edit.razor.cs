@@ -204,9 +204,15 @@ namespace InvoiceApp.Components.Pages.ExpensePages
         private async Task ReturnToSubmitter()
         {
             Expense.ExpenseStatus = context.ExpenseStatus.FirstOrDefault(es => es.Id == 1);         // 1 is "Created"
+
+            // Reset all approvals to not approved.
+            await context.Approvals
+                .Where(a => a.ExpenseId == Expense.Id)
+                .ExecuteUpdateAsync(a => a.SetProperty(approval => approval.IsApproved, false));
+
             await context.SaveChangesAsync();
-            SaveAndRefreshPage();
-            StateHasChanged();
+
+            NavigationManager.NavigateTo("/expenses");
         }
 
         private async Task MoveToAccountsPayableProcessing()

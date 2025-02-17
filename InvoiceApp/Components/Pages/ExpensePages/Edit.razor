@@ -21,7 +21,8 @@
     <div class="col-md-3 mb-3">
         <h4>Submission Status: @Expense.ExpenseStatus.StatusName</h4>
     </div>
-    <div class="col-md-6 mb-3">
+
+    <div class="col-md-@(IsEditing ? "6" : "9" ) mb-3">
         <div class="text-end">
             <!-- Button to trigger modal -->
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNoteModal">Add Note</button>
@@ -29,9 +30,10 @@
 
         </div>
     </div>
-    <div class="col-md-3 mb-3 d-flex justify-content-end">
-        @if (IsEditing)
-        {
+    @if (IsEditing)
+    {
+        <div class="col-md-3 mb-3 d-flex justify-content-end">
+
             <div class="dropdown d-inline-block w-100" style="margin-right:1.1em;">
                 <button class="btn btn-success dropdown-toggle w-100" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false" style="margin-right:1.1em;">
                     Save Actions
@@ -43,8 +45,9 @@
                     <li><a class="dropdown-item" href="/expenses">Go Back to Expense List (Don't Save)</a></li>
                 </ul>
             </div>
-        }
-    </div>
+
+        </div>
+    }
     <hr />
 </div>
 @* <p>@(IsEditing ? "Editing" : "Locked")</p> *@
@@ -269,7 +272,7 @@ else
                 <div class="text-end">
                     @if (!IsEditing && !approval.IsApproved)
                     {
-                        <button type="button" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
+                        <button type="button" style="margin-right:5px" class="btn btn-success" @onclick='() => Approve(approval.Id)'>
                             Approve
                         </button>
                     }
@@ -357,22 +360,25 @@ else
     @if (_images.Any())
     {
         <h3>Attached Images</h3>
+        <small>Click Filename to open.</small>
         <div class="row">
             @foreach (var image in _images)
             {
                 <div class="col-md-3 mb-3">
                     <div class="card">
-                        <button class="btn btn-link" @onclick="() => DownloadFile(image.Id)">
+                        <button class="btn btn-info" @onclick="() => DownloadFile(image.Id)">
                             @image.FileName
                             @* <img src="" class="card-img-top" alt="@image.FileName" /> *@
                         </button>
                         <div class="card-body">
-                            <p class="card-text">@image.FileName</p>
-                            <p style="text-align:end">
-                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAttachmentModal" @onclick='() => DeleteAttachment(image.Id)'>
-                                    Delete Attachment
-                                </button>
-                            </p>
+                            @if (IsEditing)
+                            {
+                                <p style="text-align:end">
+                                    <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#deleteAttachmentModal" @onclick='() => DeleteAttachment(image.Id)'>
+                                        Delete Attachment
+                                    </button>
+                                </p>
+                            }
                         </div>
 
                     </div>
@@ -495,24 +501,24 @@ else
 
 
 <!-- File to large -->
-@if(FileToLarge)
+@if (FileToLarge)
 {
 
-    <div class="modal show d-block" id="fileToLargeModal" tabindex="-1" aria-labelledby="fileToLargeModalLabel" >
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger" id="fileToLargeModalLabel">File Is Too Big</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>We can't upload your file, it is bigger than 20MB. <br />Please shrink the file so that it can be uploaded. </p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="FileToLargeClose">Ok</button>
+    <div class="modal show d-block" id="fileToLargeModal" tabindex="-1" aria-labelledby="fileToLargeModalLabel">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="fileToLargeModalLabel">File Is Too Big</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>We can't upload your file, it is bigger than 20MB. <br />Please shrink the file so that it can be uploaded. </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal" @onclick="FileToLargeClose">Ok</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
     <div class="modal-backdrop fade show inert"></div>
 }

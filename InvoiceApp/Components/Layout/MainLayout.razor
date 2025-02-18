@@ -4,7 +4,6 @@
 @inject InvoiceApp.Services.UserService UserService
 @inject NavigationManager NavigationManager
 
-
 <div class="page">
 
     @* <div class="sidebar"> *@
@@ -12,15 +11,11 @@
     @* </div> *@
 
     <main>
-        <div id="top" class="row" style="background-color: rgb(5, 39, 103);height:50px;color:white;">
+        <div id="top" class="row" style="background-color: rgb(5, 39, 103);height:50px;color:white;flex-wrap: nowrap;">
             <div class="col-md-6 d-flex justify-content-start align-items-center" >
-
-                <span style="font-size:1.5em;"><i class="bi bi-heptagon-fill" style="color:rgb(204, 153, 51);margin-left:25px;margin-right:10px;"></i>Invoice Flow Professional</span>
-
+                <span style="font-size:1.5em;"><i class="bi bi-heptagon-fill" style="color:rgb(204, 153, 51);margin-left:25px;margin-right:10px;"></i>Expense Flow Professional</span>
             </div>
-            <div class="col-md-6 d-flex justify-content-end align-items-center pr-30">
-
-
+            <div class="col-md-6 d-flex justify-content-end align-items-center" style="background-color: rgb(5, 39, 103);height:50px;color:white;flex-wrap: nowrap;">
                  @if (currentUser != null) 
                  { 
                      <span style="margin-right:30px">@currentUser.UserName</span> 
@@ -31,7 +26,7 @@
                 } 
              </div>
         </div>
-        <div class="row full-height" style="display: flex;">
+        <div class="row full-height" style="display: flex;flex-wrap: nowrap;">
             <div style="width: auto;height:auto;">
                 <NavMenu />
             </div>

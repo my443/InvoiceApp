@@ -6,6 +6,7 @@ using InvoiceApp.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace InvoiceApp
 {
@@ -28,6 +29,7 @@ namespace InvoiceApp
             builder.Services.AddScoped<IdentityRedirectManager>();
 
             builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+     
 
             builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
                     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -53,7 +55,6 @@ namespace InvoiceApp
                 .AddDefaultTokenProviders();
 
             builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -80,7 +81,7 @@ namespace InvoiceApp
             // Add additional endpoints required by the Identity /Account Razor components.
             app.MapAdditionalIdentityEndpoints();
 
-            app.Run();
+            app.Run();            
         }
     }
 }
